@@ -38,19 +38,15 @@ class TransactionAdmin(admin.ModelAdmin):
     list_display = ["transaction_number","organisation"
                     ,"humanitarian_or_development","loan_or_grant"
                     ,"concessional","pledge_or_disbursement"
-                    ,"recipient","sectors","year","currency","amount"
+                    ,"recipient","sector","year","currency","amount"
                     ]
     list_filter = ["organisation"
                     ,"humanitarian_or_development","loan_or_grant"
                     ,"concessional","pledge_or_disbursement"
-                    ,"recipient","year","currency","amount"
+                    ,"recipient","sector","year","currency","amount"
                     ]
-    filter_horizontal = ["sector"]
     def transaction_number(self,obj):
         return obj.pk
-    def sectors(self, obj):
-        return "; ".join([str(s) for s in obj.sector.all()])
-    sectors.admin_order_field = 'sector'
     #enable the save buttons on top of change form
     save_on_top = True
     

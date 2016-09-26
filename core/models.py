@@ -26,8 +26,8 @@ class Organisation(models.Model):
     def __unicode__(self):
         return u'%s' % self.name
     
-#    def get_absolute_url(self):
-#        return reverse("core.views.organisations",args=[self.slug])
+    def get_absolute_url(self):
+        return reverse("core.views.csv",args=[self.slug])
 
 class Contact(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
@@ -81,9 +81,18 @@ class Transaction(models.Model):
         ('N','Not defined'),
     )
     recipient = models.CharField(max_length=1,choices=RECIPIENT_CHOICES,default='N')
-    sector = models.ManyToManyField(Sector, related_name="sectors", related_query_name="sector",blank=True)
     def recipient_verbose(self):
         return dict(Transaction.RECIPIENT_CHOICES)[self.recipient]
+    DELIVERY_CHOICES = (
+        ('G','Via government institutions in refugee hosting country'),
+        ('U','Via UN agencies'),
+        ('N','Via NGOs'),
+        ('O','Other channel of delivery'),
+    )
+    channel_of_delivery = models.CharField(max_length=1,choices=DELIVERY_CHOICES,default='O')
+    def delivery_verbose(self):
+        return dict(Transaction.DELIVERY_CHOICES)[self.channel_of_delivery]
+    sector = models.ForeignKey(Sector,blank=True,null=True)
     YEAR_CHOICES = (
         (2016,2016),
         (2017,2017),
@@ -94,6 +103,8 @@ class Transaction(models.Model):
     year = models.IntegerField(choices=YEAR_CHOICES,blank=True,null=True)
     amount = models.DecimalField(max_digits=99, decimal_places=2,blank=True,null=True,help_text="If no amount was pledged/disbursed, record amount as zero. Otherwise leave field missing for unknown amount.")
     currency = models.ForeignKey(Currency,blank=True,null=True)
+    refugee_facility_for_turkey = models.BooleanField(default=False,help_text="Was/is the above amount meant for the Refugee Facility for Turkey?")
+    outside_london_conference = models.BooleanField(default=False,help_text="Was/is the above amount pledged outside of the London Conference?")
     
 #    def get_absolute_url(self):
 #        return reverse("core.views.transactions",args=[self.pk])
