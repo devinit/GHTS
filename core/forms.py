@@ -4,6 +4,6 @@ from core.models import Transaction
 class TransactionForm(ModelForm):
     class Meta:
         model = Transaction
-        exclude = ('organisation',)
+        fields = ('year','currency',)
         
 form = TransactionForm()

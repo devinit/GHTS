@@ -43,7 +43,7 @@ class Sector(models.Model):
     name = models.CharField(max_length=255)
     LOAN_OR_GRANT_CHOICES = (
         ('L','Loan'),
-        ('G','Grant')
+        ('G','Grant'),
     )
     loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,default='G')
     def loan_verbose(self):
@@ -55,27 +55,23 @@ class Sector(models.Model):
     
 class Transaction(models.Model):
     organisation = models.ForeignKey(Organisation)
-    HUM_OR_DEV_CHOICES = (
-        ('H','Humanitarian'),
-        ('D','Development')
-    )
-    humanitarian_or_development = models.CharField(max_length=1,choices=HUM_OR_DEV_CHOICES,default='H')
-    def hum_or_dev_verbose(self):
-        return dict(Transaction.HUM_OR_DEV_CHOICES)[self.humanitarian_or_development]
     LOAN_OR_GRANT_CHOICES = (
+        ('','---------'),
         ('L','Loan'),
-        ('G','Grant')
+        ('G','Grant'),
     )
-    loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,default='G')
+    loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,blank=True,null=True)
     def loan_verbose(self):
         return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
     concessional = models.BooleanField(default=True)
     PLEDGE_OR_DISB_CHOICES = (
-        ('P','Committed'),
+        ('','---------'),
+        ('P','Pledged'),
+        ('M','Committed'),
         ('C','Contracted'),
-        ('D','Disbursed')
+        ('D','Disbursed'),
     )
-    pledge_or_disbursement = models.CharField(max_length=1,choices=PLEDGE_OR_DISB_CHOICES,default='P')
+    pledge_or_disbursement = models.CharField(max_length=1,choices=PLEDGE_OR_DISB_CHOICES,blank=True,null=True)
     def pledge_or_disb_verbose(self):
         return dict(Transaction.PLEDGE_OR_DISB_CHOICES)[self.pledge_or_disbursement]
     RECIPIENT_CHOICES = (
@@ -88,10 +84,11 @@ class Transaction(models.Model):
         ('R','Region'),
         ('N','Not defined'),
     )
-    recipient = models.CharField(max_length=1,choices=RECIPIENT_CHOICES,default='N')
+    recipient = models.CharField(max_length=1,choices=RECIPIENT_CHOICES,default="N")
     def recipient_verbose(self):
         return dict(Transaction.RECIPIENT_CHOICES)[self.recipient]
     DELIVERY_CHOICES = (
+        ('','---------'),
         ('U','UN agencies'),
         ('N','NGOs'),
         ('R','RCRC'),
@@ -99,7 +96,7 @@ class Transaction(models.Model):
         ('P','Private sector'),
         ('O','Other channel of delivery'),
     )
-    channel_of_delivery = models.CharField(max_length=1,choices=DELIVERY_CHOICES,default='O')
+    channel_of_delivery = models.CharField(max_length=1,choices=DELIVERY_CHOICES,blank=True,null=True)
     def delivery_verbose(self):
         return dict(Transaction.DELIVERY_CHOICES)[self.channel_of_delivery]
     sector = models.ForeignKey(Sector,blank=True,null=True)
@@ -114,7 +111,6 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=99, decimal_places=2,blank=True,null=True,help_text="If no amount was pledged/disbursed, record amount as zero. Otherwise leave field missing for unknown amount.")
     currency = models.ForeignKey(Currency,blank=True,null=True)
     refugee_facility_for_turkey = models.BooleanField(default=False,help_text="Was/is the above amount meant for the Refugee Facility for Turkey?")
-    outside_london_conference = models.BooleanField(default=False,help_text="Was/is the above amount pledged outside of the London Conference?")
     
 #    def get_absolute_url(self):
 #        return reverse("core.views.transactions",args=[self.pk])

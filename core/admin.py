@@ -36,14 +36,14 @@ class SectorAdmin(admin.ModelAdmin):
 class TransactionAdmin(admin.ModelAdmin):
     #fields display on change list
     list_display = ["transaction_number","organisation"
-                    ,"humanitarian_or_development","loan_or_grant"
+                    ,"loan_or_grant"
                     ,"concessional","pledge_or_disbursement"
-                    ,"recipient","sector","year","currency","amount"
+                    ,"recipient","sector","channel_of_delivery","year","currency","amount"
                     ]
     list_filter = ["organisation"
-                    ,"humanitarian_or_development","loan_or_grant"
+                    ,"loan_or_grant"
                     ,"concessional","pledge_or_disbursement"
-                    ,"recipient","sector","year","currency","amount"
+                    ,"recipient","sector","channel_of_delivery","year","currency","amount"
                     ]
     def transaction_number(self,obj):
         return obj.pk

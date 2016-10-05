@@ -2,11 +2,133 @@
 
     {% block title %} Add transactions {% endblock %}
     {% block head %}
+        <style>
+            table, tr, th, td {
+                border:1px solid black;
+                border-collapse:collapse;
+                }
+            table input {border:none;height:100%;width:100%;}
+        </style>
     {% endblock %}    
     {% block content %}
     <h1>New transaction for {{contact.organisation}}</h1>
     <form method="POST" class="transaction-form">{% csrf_token %}
         {{ form.as_p }}
+        <h2>1. Grants</h2>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="G|C|{{scode}}|{{rcode}}|||"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>2. Loans - Concessional</h2>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|C|{{scode}}|{{rcode}}|||"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>3. Loans - Non-concessional</h2>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|N|{{scode}}|{{rcode}}|||"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>4. Facility contributions</h2>
+    <table>
+        <tr>
+            <th></th>
+            <th>Turkey</th>
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            <td><input type="text" name="|N|{{scode}}|T|||F"/></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>5. Sector contributions - grants</h2>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for sector in sectors %}
+        <tr>
+            <td><b>{{sector}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="G|C||{{rcode}}|{{sector}}||"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>6. Sector contributions - loans</h2>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for sector in sectors %}
+        <tr>
+            <td><b>{{sector}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|||{{rcode}}|{{sector}}||"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <h2>7. Channel contributions - grants</h2>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for ccode, channel in channels %}
+        <tr>
+            <td><b>{{channel}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="G|C||{{rcode}}||{{ccode}}|"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
     {% endblock %}
