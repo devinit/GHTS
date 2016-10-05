@@ -55,7 +55,7 @@ ROOT_URLCONF = 'ghts.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'ghts','templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+
+    {% block title %} Add transactions {% endblock %}
+    {% block head %}
+    {% endblock %}    
+    {% block content %}
+    <h1>New transaction</h1>
+    <form method="POST" class="transaction-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+    {% endblock %}

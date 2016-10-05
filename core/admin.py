@@ -29,7 +29,7 @@ class ContactAdmin(admin.ModelAdmin):
     
 class SectorAdmin(admin.ModelAdmin):
     #fields display on change list
-    list_display = ['name']
+    list_display = ['name','loan_or_grant']
     #enable the save buttons on top of change form
     save_on_top = True
     

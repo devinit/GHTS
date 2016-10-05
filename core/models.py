@@ -41,6 +41,13 @@ class Contact(models.Model):
     
 class Sector(models.Model):
     name = models.CharField(max_length=255)
+    LOAN_OR_GRANT_CHOICES = (
+        ('L','Loan'),
+        ('G','Grant')
+    )
+    loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,default='G')
+    def loan_verbose(self):
+        return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
     
     def __unicode__(self):
         return u'%s' % self.name
@@ -64,8 +71,9 @@ class Transaction(models.Model):
         return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
     concessional = models.BooleanField(default=True)
     PLEDGE_OR_DISB_CHOICES = (
-        ('P','Pledge'),
-        ('D','Disbursement')
+        ('P','Committed'),
+        ('C','Contracted'),
+        ('D','Disbursed')
     )
     pledge_or_disbursement = models.CharField(max_length=1,choices=PLEDGE_OR_DISB_CHOICES,default='P')
     def pledge_or_disb_verbose(self):
@@ -84,9 +92,11 @@ class Transaction(models.Model):
     def recipient_verbose(self):
         return dict(Transaction.RECIPIENT_CHOICES)[self.recipient]
     DELIVERY_CHOICES = (
-        ('G','Via government institutions in refugee hosting country'),
-        ('U','Via UN agencies'),
-        ('N','Via NGOs'),
+        ('U','UN agencies'),
+        ('N','NGOs'),
+        ('R','RCRC'),
+        ('G','Government institutions'),
+        ('P','Private sector'),
         ('O','Other channel of delivery'),
     )
     channel_of_delivery = models.CharField(max_length=1,choices=DELIVERY_CHOICES,default='O')
