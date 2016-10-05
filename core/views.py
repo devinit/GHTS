@@ -21,7 +21,7 @@ def add(request):
             return redirect('admin:core_transaction_changelist')
     else:
         form = TransactionForm()
-    return render(request,'core/add.html', {"user":user,"form":form})
+    return render(request,'core/add.html', {"user":user,"contact":contact,"form":form})
 
 @login_required
 def index(request):
