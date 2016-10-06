@@ -11,7 +11,30 @@
         </style>
     {% endblock %}    
     {% block content %}
-    <h1>New transaction for {{contact.organisation}}</h1>
+    <h1>Transactions for {{contact.organisation}} in {{selected_year}}</h1>
+    <p>
+        <label>Year:</label>
+        <select id="year">
+            
+            {% for year1, year2 in years%}
+                {% if year1 == selected_year %}
+                <option value="{{year1}}" selected="selected">{{year1}}</option>
+                {% else %}
+                <option value="{{year1}}">{{year1}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+    </p>
+    <script>
+        $("#year").change(function(){
+            var confirmed = window.confirm("Are you sure you want to change the year? Changing the year will erase any unsaved data.");
+            if (confirmed) {
+                var yearVal = $("#year").val();
+                var url =  "{% url 'core.views.add' 2016 %}".replace("2016",yearVal);
+                window.location.replace(url);
+            };
+        });
+    </script>
     <form method="POST" class="transaction-form">{% csrf_token %}
         {{ form.as_p }}
         <h2>1. Grants</h2>

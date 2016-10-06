@@ -111,6 +111,23 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=99, decimal_places=2,blank=True,null=True,help_text="If no amount was pledged/disbursed, record amount as zero. Otherwise leave field missing for unknown amount.")
     currency = models.ForeignKey(Currency,blank=True,null=True)
     refugee_facility_for_turkey = models.BooleanField(default=False,help_text="Was/is the above amount meant for the Refugee Facility for Turkey?")
+    comment = models.TextField(null=True,blank=True)
     
-#    def get_absolute_url(self):
-#        return reverse("core.views.transactions",args=[self.pk])
+class Spreadsheet(models.Model):
+    YEAR_CHOICES = (
+        (2016,2016),
+        (2017,2017),
+        (2018,2018),
+        (2019,2019),
+        (2020,2020),
+    )
+    year = models.IntegerField(choices=YEAR_CHOICES)
+    currency = models.ForeignKey(Currency)
+    organisation = models.ForeignKey(Organisation)
+    
+class Entry(models.Model):
+    coordinates = models.CharField(max_length=300)
+    amount = models.DecimalField(max_digits=99, decimal_places=2,blank=True,null=True)
+    spreadsheet = models.ForeignKey(Spreadsheet)
+
+

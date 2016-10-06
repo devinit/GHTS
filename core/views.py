@@ -15,21 +15,23 @@ def safeInt(x):
         return -1
 
 @login_required
-def add(request):
+def add(request,year):
     user = request.user
     contact = get_object_or_404(Contact,user=user)
+    organisation = contact.organisation
     recipients = Transaction.RECIPIENT_CHOICES
     statuses = Transaction.PLEDGE_OR_DISB_CHOICES
     sectors = Sector.objects.all()
     channels = Transaction.DELIVERY_CHOICES
+    years = Transaction.YEAR_CHOICES
+    year = int(year)
     if request.method == "POST":
         form = TransactionForm(request.POST)
         queryDict = request.POST
-        year = safeInt(queryDict.get('year'))
+        comment = queryDict.get('comment')
         currencyPK = safeInt(queryDict.get('currency'))
-        # print(queryDict)
         for key, value in queryDict.iteritems():
-            if key != "year" and key != "currency" and safeInt(value)>0:
+            if key != "currency" and key != "comment" and safeInt(value)>0:
                 meta = key.split("|")
                 loan_or_grant = meta[0]
                 concessional = meta[1]=="C"
@@ -39,7 +41,7 @@ def add(request):
                 channel_of_delivery = meta[5]
                 facility = meta[6]=="F"
                 transaction = Transaction()
-                transaction.organisation = contact.organisation
+                transaction.organisation = organisation
                 if year > 0:
                     transaction.year = year
                 if currencyPK>0:
@@ -55,11 +57,16 @@ def add(request):
                 transaction.channel_of_delivery = channel_of_delivery
                 transaction.refugee_facility_for_turkey = facility
                 transaction.amount = value
+                transaction.comment = comment
                 transaction.save()
         return redirect('admin:core_transaction_changelist')
     else:
-        form = TransactionForm()
-    return render(request,'core/add.html', {"user":user,"contact":contact,"form":form,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels})
+        transactions = Transaction.objects.filter(organisation=organisation,year=year)
+        if len(transactions)>0:
+            form = TransactionForm(instance=transactions[0])
+        else:
+            form = TransactionForm()
+    return render(request,'core/add.html', {"user":user,"contact":contact,"form":form,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year})
 
 @login_required
 def index(request):

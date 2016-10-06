@@ -4,6 +4,4 @@ from core.models import Transaction
 class TransactionForm(ModelForm):
     class Meta:
         model = Transaction
-        fields = ('year','currency',)
-        
-form = TransactionForm()
+        fields = ('currency','comment',)
