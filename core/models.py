@@ -56,7 +56,6 @@ class Sector(models.Model):
 class Transaction(models.Model):
     organisation = models.ForeignKey(Organisation)
     LOAN_OR_GRANT_CHOICES = (
-        ('','---------'),
         ('L','Loan'),
         ('G','Grant'),
     )
@@ -65,7 +64,6 @@ class Transaction(models.Model):
         return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
     concessional = models.BooleanField(default=True)
     PLEDGE_OR_DISB_CHOICES = (
-        ('','---------'),
         ('P','Pledged'),
         ('M','Committed'),
         ('C','Contracted'),
@@ -88,7 +86,6 @@ class Transaction(models.Model):
     def recipient_verbose(self):
         return dict(Transaction.RECIPIENT_CHOICES)[self.recipient]
     DELIVERY_CHOICES = (
-        ('','---------'),
         ('U','UN agencies'),
         ('N','NGOs'),
         ('R','RCRC'),

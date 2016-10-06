@@ -13,7 +13,7 @@
     {% block content %}
     <h1>Transactions for {{contact.organisation}} in {{selected_year}}</h1>
     <p>
-        <label>Year:</label>
+        <label>Change year:</label>
         <select id="year">
             
             {% for year1, year2 in years%}
@@ -24,15 +24,13 @@
                 {% endif %}
             {% endfor %}
         </select>
+        <button id="yearBtn">Go</button>
     </p>
     <script>
-        $("#year").change(function(){
-            var confirmed = window.confirm("Are you sure you want to change the year? Changing the year will erase any unsaved data.");
-            if (confirmed) {
-                var yearVal = $("#year").val();
-                var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
-                window.location.replace(url);
-            };
+        $("#yearBtn").click(function(){
+            var yearVal = $("#year").val();
+            var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
+            window.location.replace(url);
         });
     </script>
     <form method="POST" class="transaction-form">{% csrf_token %}
@@ -158,5 +156,35 @@
     {% for entry in entries %}
         $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{currency.symbol}}"+"{{entry.amount}}".replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"))
     {% endfor %}
+    $('input').change(function() {
+        if( $(this).val() != "" ){
+            window.onbeforeunload = function(e) {
+                var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+                e.returnValue = dialogText;
+                return dialogText;
+            };
+        }
+    });
+    $('textarea').change(function() {
+        if( $(this).val() != "" ){
+            window.onbeforeunload = function(e) {
+                var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+                e.returnValue = dialogText;
+                return dialogText;
+            };
+        }
+    });
+    $('select:not(#year)').change(function() {
+        window.onbeforeunload = function(e) {
+            var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+            e.returnValue = dialogText;
+            return dialogText;
+        };
+    });
+    $( "button[type='submit']" ).click(function(){
+        window.onbeforeunload = function () {
+            // blank function do nothing
+        };
+    });
     </script>
     {% endblock %}
