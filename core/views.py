@@ -7,18 +7,7 @@ from django.template import RequestContext
 from django.http import *
 from django.contrib.auth.decorators import login_required
 from .forms import SpreadsheetForm
-
-def safeInt(x):
-    try:
-        return int(x)
-    except:
-        return -1
-    
-def safeFloat(x):
-    try:
-        return float(x)
-    except:
-        return -1.00
+from .util import *
 
 @login_required
 def edit(request,year):
@@ -35,26 +24,21 @@ def edit(request,year):
         form = SpreadsheetForm(request.POST)
         queryDict = request.POST
         comment = queryDict.get('comment')
-        currencyPK = safeInt(queryDict.get('currency'))
         if not Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
-            spreadsheet = Spreadsheet()
+            spreadsheet = form.save(commit=False)
             spreadsheet.year = year
             spreadsheet.organisation = organisation
-            if currencyPK>0:
-                currency = Currency.objects.get(pk=currencyPK)
-            else:
-                currency = Currency.objects.all()[0]
-            spreadsheet.currency = currency
-            spreadsheet.comment = comment
             spreadsheet.save()
         else:
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
+            form = SpreadsheetForm(request.POST,instance=spreadsheet)
+            spreadsheet = form.save()
         excludeKeys = ["currency","comment","csrfmiddlewaretoken"]
         for key, value in queryDict.iteritems():
             if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
                 entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
-                if safeFloat(value)>0:
-                    entry.amount = value
+                if safeFloat(value)>=0:
+                    entry.amount = safeFloat(value)
                     entry.save()
                 else:
                     entry.delete()
@@ -62,8 +46,8 @@ def edit(request,year):
                 entry = Entry()
                 entry.spreadsheet = spreadsheet
                 entry.coordinates = key
-                if safeFloat(value)>0:
-                    entry.amount = value
+                if safeFloat(value)>=0:
+                    entry.amount = safeFloat(value)
                     entry.save()
         return redirect(spreadsheet)
     else:
@@ -71,10 +55,12 @@ def edit(request,year):
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
             form = SpreadsheetForm(instance=spreadsheet)
             entries = Entry.objects.filter(spreadsheet=spreadsheet)
+            currency = spreadsheet.currency
         else:
             form = SpreadsheetForm()
             entries = []
-    return render(request,'core/edit.html', {"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year})
+            currency = []
+    return render(request,'core/edit.html', {"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"currency":currency})
 
 @login_required
 def index(request):
@@ -84,51 +70,77 @@ def index(request):
 @login_required
 def csv(request,slug):
     organisation = get_object_or_404(Organisation,slug=slug)
-    transactions = Transaction.objects.filter(organisation=organisation)
+    spreadsheets = Spreadsheet.objects.filter(organisation=organisation)
+    entries = Entry.objects.filter(spreadsheet__in=spreadsheets)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="'+slug+'.csv"'
     writer = csvwriter(response)
     header = ["Organisation","Loan or grant","Concessional","Pledge or disbursement"
-              ,"Recipient","Channel of delivery","Sector","Year","Amount","Currency"
-              ,"Refugee facility for Turkey"]
+              ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
+              ,"Refugee facility for Turkey","Comment"]
     writer.writerow(header)
-    for transaction in transactions:
-        writer.writerow([transaction.organisation
-                         ,transaction.loan_verbose()
-                         ,transaction.concessional
-                         ,transaction.pledge_or_disb_verbose()
-                         ,transaction.recipient_verbose()
-                         ,transaction.delivery_verbose()
-                         ,transaction.sector
-                         ,transaction.year
-                         ,transaction.amount
-                         ,transaction.currency
-                         ,transaction.refugee_facility_for_turkey
+    for entry in entries:
+        year = entry.spreadsheet.year
+        comment = entry.spreadsheet.comment
+        currency = entry.spreadsheet.currency
+        meta = entry.coordinates.split("|")
+        loan_or_grant = meta[0]
+        concessional = meta[1]=="C"
+        pledge_or_disbursement = meta[2]
+        recipient = meta[3]
+        sectorName = meta[4]
+        channel_of_delivery = meta[5]
+        facility = meta[6]=="F"
+        writer.writerow([organisation
+                         ,meta[0]
+                         ,meta[1]=="C"
+                         ,meta[2]
+                         ,meta[3]
+                         ,meta[4]
+                         ,meta[5]
+                         ,year
+                         ,entry.amount
+                         ,currency
+                         ,meta[6]=="F"
+                         ,comment
                          ])
     return response
 
 @login_required
 def csv_all(request):
-    transactions = Transaction.objects.all()
+    entries = Entry.objects.all()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="all.csv"'
     writer = csvwriter(response)
     header = ["Organisation","Loan or grant","Concessional","Pledge or disbursement"
-              ,"Recipient","Channel of delivery","Sector","Year","Amount","Currency"
-              ,"Refugee facility for Turkey"]
+              ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
+              ,"Refugee facility for Turkey","Comment"]
     writer.writerow(header)
-    for transaction in transactions:
-        writer.writerow([transaction.organisation
-                         ,transaction.loan_verbose()
-                         ,transaction.concessional
-                         ,transaction.pledge_or_disb_verbose()
-                         ,transaction.recipient_verbose()
-                         ,transaction.delivery_verbose()
-                         ,transaction.sector
-                         ,transaction.year
-                         ,transaction.amount
-                         ,transaction.currency
-                         ,transaction.refugee_facility_for_turkey
+    for entry in entries:
+        organisation = entry.spreadsheet.organisation
+        year = entry.spreadsheet.year
+        comment = entry.spreadsheet.comment
+        currency = entry.spreadsheet.currency
+        meta = entry.coordinates.split("|")
+        loan_or_grant = meta[0]
+        concessional = meta[1]=="C"
+        pledge_or_disbursement = meta[2]
+        recipient = meta[3]
+        sectorName = meta[4]
+        channel_of_delivery = meta[5]
+        facility = meta[6]=="F"
+        writer.writerow([organisation
+                         ,meta[0]
+                         ,meta[1]=="C"
+                         ,meta[2]
+                         ,meta[3]
+                         ,meta[4]
+                         ,meta[5]
+                         ,year
+                         ,entry.amount
+                         ,currency
+                         ,meta[6]=="F"
+                         ,comment
                          ])
     return response
 

@@ -156,7 +156,7 @@
     </form>
     <script>
     {% for entry in entries %}
-        $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{entry.amount}}")
+        $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{currency.symbol}}"+"{{entry.amount}}".replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"))
     {% endfor %}
     </script>
     {% endblock %}
