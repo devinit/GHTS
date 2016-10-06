@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Contact, Organisation, Currency, Sector, Transaction
+from core.models import Contact, Organisation, Currency, Sector, Transaction, Spreadsheet, Entry
 # Register your models here.
 
 class ContactInline(admin.TabularInline):
@@ -50,8 +50,24 @@ class TransactionAdmin(admin.ModelAdmin):
     #enable the save buttons on top of change form
     save_on_top = True
     
+class SpreadsheetAdmin(admin.ModelAdmin):
+    #fields display on change list
+    list_display = ["year","organisation","currency"]
+    list_filter = ["year","organisation","currency"]
+    #enable the save buttons on top of change form
+    save_on_top = True
+    
+class EntryAdmin(admin.ModelAdmin):
+    #fields display on change list
+    list_display = ["spreadsheet","coordinates","amount"]
+    list_filter = ["spreadsheet","coordinates","amount"]
+    #enable the save buttons on top of change form
+    save_on_top = True
+    
 admin.site.register(Organisation,OrganisationAdmin)
 admin.site.register(Currency,CurrencyAdmin)
 admin.site.register(Contact,ContactAdmin)
 admin.site.register(Sector,SectorAdmin)
 admin.site.register(Transaction,TransactionAdmin)
+admin.site.register(Spreadsheet,SpreadsheetAdmin)
+admin.site.register(Entry,EntryAdmin)

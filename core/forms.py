@@ -1,7 +1,7 @@
 from django.forms import ModelForm
-from core.models import Transaction
-
-class TransactionForm(ModelForm):
+from core.models import Spreadsheet
+        
+class SpreadsheetForm(ModelForm):
     class Meta:
-        model = Transaction
+        model = Spreadsheet
         fields = ('currency','comment',)

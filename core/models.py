@@ -124,10 +124,17 @@ class Spreadsheet(models.Model):
     year = models.IntegerField(choices=YEAR_CHOICES)
     currency = models.ForeignKey(Currency)
     organisation = models.ForeignKey(Organisation)
+    comment = models.TextField(null=True,blank=True)
+    
+    def get_absolute_url(self):
+        return reverse("core.views.edit",args=[self.year])
     
 class Entry(models.Model):
     coordinates = models.CharField(max_length=300)
     amount = models.DecimalField(max_digits=99, decimal_places=2,blank=True,null=True)
     spreadsheet = models.ForeignKey(Spreadsheet)
+    
+    class Meta:
+        verbose_name_plural = "entries"
 
 

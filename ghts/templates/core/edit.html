@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-    {% block title %} Add transactions {% endblock %}
+    {% block title %} Edit transactions {% endblock %}
     {% block head %}
         <style>
             table, tr, th, td {
@@ -30,7 +30,7 @@
             var confirmed = window.confirm("Are you sure you want to change the year? Changing the year will erase any unsaved data.");
             if (confirmed) {
                 var yearVal = $("#year").val();
-                var url =  "{% url 'core.views.add' 2016 %}".replace("2016",yearVal);
+                var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
                 window.location.replace(url);
             };
         });
@@ -154,4 +154,9 @@
     </table>
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
+    <script>
+    {% for entry in entries %}
+        $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{entry.amount}}")
+    {% endfor %}
+    </script>
     {% endblock %}

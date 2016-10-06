@@ -1,21 +1,27 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
-from core.models import Organisation, Transaction, Contact, Sector, Currency
+from core.models import Organisation, Transaction, Contact, Sector, Currency, Spreadsheet, Entry
 from csv import writer as csvwriter
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.http import *
 from django.contrib.auth.decorators import login_required
-from .forms import TransactionForm
+from .forms import SpreadsheetForm
 
 def safeInt(x):
     try:
         return int(x)
     except:
         return -1
+    
+def safeFloat(x):
+    try:
+        return float(x)
+    except:
+        return -1.00
 
 @login_required
-def add(request,year):
+def edit(request,year):
     user = request.user
     contact = get_object_or_404(Contact,user=user)
     organisation = contact.organisation
@@ -26,47 +32,49 @@ def add(request,year):
     years = Transaction.YEAR_CHOICES
     year = int(year)
     if request.method == "POST":
-        form = TransactionForm(request.POST)
+        form = SpreadsheetForm(request.POST)
         queryDict = request.POST
         comment = queryDict.get('comment')
         currencyPK = safeInt(queryDict.get('currency'))
-        for key, value in queryDict.iteritems():
-            if key != "currency" and key != "comment" and safeInt(value)>0:
-                meta = key.split("|")
-                loan_or_grant = meta[0]
-                concessional = meta[1]=="C"
-                pledge_or_disbursement = meta[2]
-                recipient = meta[3]
-                sectorName = meta[4]
-                channel_of_delivery = meta[5]
-                facility = meta[6]=="F"
-                transaction = Transaction()
-                transaction.organisation = organisation
-                if year > 0:
-                    transaction.year = year
-                if currencyPK>0:
-                    currency = Currency.objects.get(pk=currencyPK)
-                    transaction.currency = currency
-                transaction.loan_or_grant = loan_or_grant
-                transaction.concessional = concessional
-                transaction.pledge_or_disbursement = pledge_or_disbursement
-                transaction.recipient = recipient
-                if sectorName!="":
-                    sector = Sector.objects.get(name=sectorName)
-                    transaction.sector = sector
-                transaction.channel_of_delivery = channel_of_delivery
-                transaction.refugee_facility_for_turkey = facility
-                transaction.amount = value
-                transaction.comment = comment
-                transaction.save()
-        return redirect('admin:core_transaction_changelist')
-    else:
-        transactions = Transaction.objects.filter(organisation=organisation,year=year)
-        if len(transactions)>0:
-            form = TransactionForm(instance=transactions[0])
+        if not Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
+            spreadsheet = Spreadsheet()
+            spreadsheet.year = year
+            spreadsheet.organisation = organisation
+            if currencyPK>0:
+                currency = Currency.objects.get(pk=currencyPK)
+            else:
+                currency = Currency.objects.all()[0]
+            spreadsheet.currency = currency
+            spreadsheet.comment = comment
+            spreadsheet.save()
         else:
-            form = TransactionForm()
-    return render(request,'core/add.html', {"user":user,"contact":contact,"form":form,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year})
+            spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
+        excludeKeys = ["currency","comment","csrfmiddlewaretoken"]
+        for key, value in queryDict.iteritems():
+            if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
+                entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
+                if safeFloat(value)>0:
+                    entry.amount = value
+                    entry.save()
+                else:
+                    entry.delete()
+            elif key not in excludeKeys and value!="":
+                entry = Entry()
+                entry.spreadsheet = spreadsheet
+                entry.coordinates = key
+                if safeFloat(value)>0:
+                    entry.amount = value
+                    entry.save()
+        return redirect(spreadsheet)
+    else:
+        if Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
+            spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
+            form = SpreadsheetForm(instance=spreadsheet)
+            entries = Entry.objects.filter(spreadsheet=spreadsheet)
+        else:
+            form = SpreadsheetForm()
+            entries = []
+    return render(request,'core/edit.html', {"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year})
 
 @login_required
 def index(request):

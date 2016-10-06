@@ -28,7 +28,7 @@
                 Welcome,
                 <strong>{% firstof user.get_short_name user.get_username %}</strong>.
             {% endblock %}
-            <a href="{% url 'core.views.add' 2016 %}">Edit transactions</a> /
+            <a href="{% url 'core.views.edit' 2016 %}">Edit transactions</a> /
             {% block userlinks %}
                 <a href="{% url 'admin:login' %}">Administration</a> /
                 <a href="{% url 'core.views.login_user' %}">Log out</a>
