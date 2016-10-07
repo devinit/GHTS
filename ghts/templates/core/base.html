@@ -30,7 +30,9 @@
             {% endblock %}
             <a href="{% url 'core.views.edit' 2016 %}">Edit transactions</a> /
             {% block userlinks %}
+            {% if user.is_staff %}
                 <a href="{% url 'admin:login' %}">Administration</a> /
+            {% endif %}
                 <a href="{% url 'core.views.login_user' %}">Log out</a>
             {% endblock %}
         </div>
