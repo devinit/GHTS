@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
-from core.models import Organisation, Transaction, Contact, Sector, Currency, Spreadsheet, Entry
+from core.models import Organisation, Contact, Sector, Currency, Spreadsheet, Entry
 from csv import writer as csvwriter
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
@@ -11,14 +11,15 @@ from .util import *
 
 @login_required
 def edit(request,year):
+    facility_years = [2016,2017]
     user = request.user
     contact = get_object_or_404(Contact,user=user)
     organisation = contact.organisation
-    recipients = Transaction.RECIPIENT_CHOICES
-    statuses = Transaction.PLEDGE_OR_DISB_CHOICES
+    recipients = Entry.RECIPIENT_CHOICES
+    statuses = Entry.PLEDGE_OR_DISB_CHOICES
     sectors = Sector.objects.all()
-    channels = Transaction.DELIVERY_CHOICES
-    years = Transaction.YEAR_CHOICES
+    channels = Entry.DELIVERY_CHOICES
+    years = Spreadsheet.YEAR_CHOICES
     year = int(year)
     if request.method == "POST":
         form = SpreadsheetForm(request.POST)
@@ -60,7 +61,7 @@ def edit(request,year):
             form = SpreadsheetForm()
             entries = []
             currency = []
-    return render(request,'core/edit.html', {"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"currency":currency})
+    return render(request,'core/edit.html', {"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"currency":currency,"facility_years":facility_years})
 
 @login_required
 def index(request):
@@ -83,25 +84,17 @@ def csv(request,slug):
         year = entry.spreadsheet.year
         comment = entry.spreadsheet.comment
         currency = entry.spreadsheet.currency
-        meta = entry.coordinates.split("|")
-        loan_or_grant = meta[0]
-        concessional = meta[1]=="C"
-        pledge_or_disbursement = meta[2]
-        recipient = meta[3]
-        sectorName = meta[4]
-        channel_of_delivery = meta[5]
-        facility = meta[6]=="F"
         writer.writerow([organisation
-                         ,meta[0]
-                         ,meta[1]=="C"
-                         ,meta[2]
-                         ,meta[3]
-                         ,meta[4]
-                         ,meta[5]
+                         ,entry.loan_or_grant()
+                         ,entry.concessional()
+                         ,entry.pledge_or_disbursement()
+                         ,entry.recipient()
+                         ,entry.sectorName()
+                         ,entry.channel_of_delivery()
                          ,year
                          ,entry.amount
                          ,currency
-                         ,meta[6]=="F"
+                         ,entry.facility()
                          ,comment
                          ])
     return response
@@ -121,25 +114,17 @@ def csv_all(request):
         year = entry.spreadsheet.year
         comment = entry.spreadsheet.comment
         currency = entry.spreadsheet.currency
-        meta = entry.coordinates.split("|")
-        loan_or_grant = meta[0]
-        concessional = meta[1]=="C"
-        pledge_or_disbursement = meta[2]
-        recipient = meta[3]
-        sectorName = meta[4]
-        channel_of_delivery = meta[5]
-        facility = meta[6]=="F"
         writer.writerow([organisation
-                         ,meta[0]
-                         ,meta[1]=="C"
-                         ,meta[2]
-                         ,meta[3]
-                         ,meta[4]
-                         ,meta[5]
+                         ,entry.loan_or_grant()
+                         ,entry.concessional()
+                         ,entry.pledge_or_disbursement()
+                         ,entry.recipient()
+                         ,entry.sectorName()
+                         ,entry.channel_of_delivery()
                          ,year
                          ,entry.amount
                          ,currency
-                         ,meta[6]=="F"
+                         ,entry.facility()
                          ,comment
                          ])
     return response

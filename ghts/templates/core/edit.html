@@ -8,7 +8,11 @@
                 border-collapse:collapse;
                 }
             table input {border:none;height:100%;width:100%;}
+            div.titleWrap {width:100%;float:left;}
+            .titleWrap h2 {float:left;}
         </style>
+        {% load staticfiles %}    
+            <link rel=stylesheet href="{% static "core/css/info.css" %}" type="text/css">
     {% endblock %}    
     {% block content %}
     <h1>Transactions for {{contact.organisation}} in {{selected_year}}</h1>
@@ -35,7 +39,14 @@
     </script>
     <form method="POST" class="transaction-form">{% csrf_token %}
         {{ form.as_p }}
-        <h2>1. Grants</h2>
+    {% if contact.organisation.grant_making %}
+    <div class="titleWrap">
+        <h2>Grants</h2>
+        <div class="info" onclick="toggle('grants')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="grants">Information on grants</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -52,7 +63,15 @@
         </tr>
     {% endfor %}
     </table>
-    <h2>2. Loans - Concessional</h2>
+    {% endif %}
+    {% if contact.organisation.loan_making %}
+    <div class="titleWrap">
+        <h2>Loans - Concessional</h2>
+        <div class="info" onclick="toggle('loansC')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="loansC">Information on loans - concessional</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -69,7 +88,13 @@
         </tr>
     {% endfor %}
     </table>
-    <h2>3. Loans - Non-concessional</h2>
+    <div class="titleWrap">
+        <h2>Loans - Non-concessional</h2>
+        <div class="info" onclick="toggle('loansN')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="loansN">Information on loans - non-concessional</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -86,7 +111,15 @@
         </tr>
     {% endfor %}
     </table>
-    <h2>4. Facility contributions</h2>
+    {% endif %}
+    {% if selected_year in facility_years and contact.organisation.government %}
+    <div class="titleWrap">
+        <h2>Facility contributions</h2>
+        <div class="info" onclick="toggle('facility')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="facility">Information on facility contributions</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -99,7 +132,15 @@
         </tr>
     {% endfor %}
     </table>
-    <h2>5. Sector contributions - grants</h2>
+    {% endif %}
+    {% if contact.organisation.grant_making %}
+    <div class="titleWrap">
+        <h2>Sector contributions - grants</h2>
+        <div class="info" onclick="toggle('sectorG')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="sectorG">Information on sector contributions - grants</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -116,7 +157,15 @@
         </tr>
     {% endfor %}
     </table>
-    <h2>6. Sector contributions - loans</h2>
+    {% endif %}
+    {% if contact.organisation.loan_making %}
+    <div class="titleWrap">
+        <h2>Sector contributions - loans</h2>
+        <div class="info" onclick="toggle('sectorL')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="sectorL">Information on sector contributions - loans</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -133,7 +182,15 @@
         </tr>
     {% endfor %}
     </table>
-    <h2>7. Channel contributions - grants</h2>
+    {% endif %}
+    {% if contact.organisation.grant_making %}    
+    <div class="titleWrap">
+        <h2>Channel contributions - grants</h2>
+        <div class="info" onclick="toggle('channel')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="channel">Information on channel contributions - grants</div>
+        </div>
+    </div>
     <table>
         <tr>
             <th></th>
@@ -150,9 +207,13 @@
         </tr>
     {% endfor %}
     </table>
+    {% endif %}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
     <script>
+    toggle = function(selector){
+        $(".popup#"+selector).slideToggle()
+    };
     {% for entry in entries %}
         $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{currency.symbol}}"+"{{entry.amount}}".replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"))
     {% endfor %}

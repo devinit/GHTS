@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Contact, Organisation, Currency, Sector, Transaction, Spreadsheet, Entry
+from core.models import Contact, Organisation, Currency, Sector, Spreadsheet, Entry
 # Register your models here.
 
 class ContactInline(admin.TabularInline):
@@ -7,7 +7,7 @@ class ContactInline(admin.TabularInline):
 
 class OrganisationAdmin(admin.ModelAdmin):
     #fields display on change list
-    list_display = ['name']
+    list_display = ['name','grant_making','loan_making','government']
     inlines = [ContactInline,]
     prepopulated_fields = {'slug': ('name',), }
     #enable the save buttons on top of change form
@@ -33,23 +33,6 @@ class SectorAdmin(admin.ModelAdmin):
     #enable the save buttons on top of change form
     save_on_top = True
     
-class TransactionAdmin(admin.ModelAdmin):
-    #fields display on change list
-    list_display = ["transaction_number","organisation"
-                    ,"loan_or_grant"
-                    ,"concessional","pledge_or_disbursement"
-                    ,"recipient","sector","channel_of_delivery","year","currency","amount"
-                    ]
-    list_filter = ["organisation"
-                    ,"loan_or_grant"
-                    ,"concessional","pledge_or_disbursement"
-                    ,"recipient","sector","channel_of_delivery","year","currency","amount"
-                    ]
-    def transaction_number(self,obj):
-        return obj.pk
-    #enable the save buttons on top of change form
-    save_on_top = True
-    
 class SpreadsheetAdmin(admin.ModelAdmin):
     #fields display on change list
     list_display = ["year","organisation","currency"]
@@ -68,6 +51,5 @@ admin.site.register(Organisation,OrganisationAdmin)
 admin.site.register(Currency,CurrencyAdmin)
 admin.site.register(Contact,ContactAdmin)
 admin.site.register(Sector,SectorAdmin)
-admin.site.register(Transaction,TransactionAdmin)
 admin.site.register(Spreadsheet,SpreadsheetAdmin)
 admin.site.register(Entry,EntryAdmin)
