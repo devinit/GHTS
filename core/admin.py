@@ -42,8 +42,31 @@ class SpreadsheetAdmin(admin.ModelAdmin):
     
 class EntryAdmin(admin.ModelAdmin):
     #fields display on change list
-    list_display = ["spreadsheet","coordinates","amount"]
-    list_filter = ["spreadsheet","coordinates","amount"]
+    list_display = ["number"
+                    ,"coordinates"
+                    ,"organisation"
+                    ,"loan_or_grant"
+                    ,"concessional"
+                    ,"pledge_or_disbursement"
+                    ,"recipient"
+                    ,"sector"
+                    ,"channel_of_delivery"
+                    ,"refugee_facility_for_turkey"
+                    ,"amount"
+                    ]
+    list_filter = ["spreadsheet__organisation"
+                    ,"loan_or_grant"
+                    ,"concessional"
+                    ,"pledge_or_disbursement"
+                    ,"recipient"
+                    ,"sector"
+                    ,"channel_of_delivery"
+                    ,"refugee_facility_for_turkey"
+                    ]
+    def number(self,obj):
+        return obj.pk
+    def organisation(self,obj):
+        return obj.spreadsheet.organisation
     #enable the save buttons on top of change form
     save_on_top = True
     

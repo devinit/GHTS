@@ -40,7 +40,7 @@ def edit(request,year):
                 entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
                 if safeFloat(value)>=0:
                     entry.amount = safeFloat(value)
-                    entry.save()
+                    entry.save_reverse()
                 else:
                     entry.delete()
             elif key not in excludeKeys and value!="":
@@ -49,7 +49,7 @@ def edit(request,year):
                 entry.coordinates = key
                 if safeFloat(value)>=0:
                     entry.amount = safeFloat(value)
-                    entry.save()
+                    entry.save_reverse()
         return redirect(spreadsheet)
     else:
         if Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
@@ -85,16 +85,16 @@ def csv(request,slug):
         comment = entry.spreadsheet.comment
         currency = entry.spreadsheet.currency
         writer.writerow([organisation
-                         ,entry.loan_or_grant()
-                         ,entry.concessional()
-                         ,entry.pledge_or_disbursement()
-                         ,entry.recipient()
-                         ,entry.sectorName()
-                         ,entry.channel_of_delivery()
+                         ,entry.loan_or_grant_translate()
+                         ,entry.concessional_translate()
+                         ,entry.pledge_or_disbursement_translate()
+                         ,entry.recipient_translate()
+                         ,entry.sector
+                         ,entry.channel_of_delivery_translate()
                          ,year
                          ,entry.amount
                          ,currency
-                         ,entry.facility()
+                         ,entry.facility_translate()
                          ,comment
                          ])
     return response
@@ -115,16 +115,16 @@ def csv_all(request):
         comment = entry.spreadsheet.comment
         currency = entry.spreadsheet.currency
         writer.writerow([organisation
-                         ,entry.loan_or_grant()
-                         ,entry.concessional()
-                         ,entry.pledge_or_disbursement()
-                         ,entry.recipient()
-                         ,entry.sectorName()
-                         ,entry.channel_of_delivery()
+                         ,entry.loan_or_grant_translate()
+                         ,entry.concessional_translate()
+                         ,entry.pledge_or_disbursement_translate()
+                         ,entry.recipient_translate()
+                         ,entry.sector
+                         ,entry.channel_of_delivery_translate()
                          ,year
                          ,entry.amount
                          ,currency
-                         ,entry.facility()
+                         ,entry.facility_translate()
                          ,comment
                          ])
     return response

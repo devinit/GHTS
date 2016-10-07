@@ -211,12 +211,82 @@
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
     <script>
+//        Function to toggle the popups
     toggle = function(selector){
         $(".popup#"+selector).slideToggle()
     };
+//    Functions to control Excel-like arrowkeying
+    var currentRow = 1;
+    var currentCell = 1;
+    var trLen = $('tr').length - 1;
+    var tdMax = 0
+    $('tr').each(function(i,e){
+        var tdCount = e.getElementsByTagName('td').length - 1;
+        if (tdCount>tdMax) {
+            tdMax = tdCount
+        };
+    });
+
+    function ChangeCurrentCell() {
+        if (currentRow<1) {
+            currentRow = 1;
+        }
+        if (currentCell<1) {
+            currentCell = 1;
+        }
+        if (currentRow>trLen) {
+            currentRow = trLen;
+        }
+        if (currentCell>tdMax) {
+            currentCell=tdMax
+        }
+        var tableRow = $('tr')[currentRow];
+        var tableCell = tableRow.children[currentCell];
+        if (tableCell!==undefined) {
+            var cellInput = tableCell.getElementsByTagName("input");
+            if (cellInput.length>0) {
+                cellInput[0].focus();
+                cellInput[0].select();
+            };
+        };
+    };
+    ChangeCurrentCell()
+    function GetCurrentCell() {
+        var activeElement = document.activeElement;
+        var tableCell = activeElement.parentElement;
+        var tableRow = tableCell.parentElement;
+        currentCell = Array.prototype.indexOf.call(tableRow.children, tableCell);
+        currentRow = Array.prototype.indexOf.call($('tr'), tableRow);
+    }
+    $('input').on("focus",GetCurrentCell);
+
+    $(document).keydown(function(e){
+        if (e.keyCode == 37) { 
+           currentCell--;
+           ChangeCurrentCell();
+           return false;
+        }
+        if (e.keyCode == 38) { 
+           currentRow--;
+           ChangeCurrentCell();
+           return false;
+        }
+        if (e.keyCode == 39) { 
+           currentCell++;
+           ChangeCurrentCell();
+           return false;
+        }
+        if (e.keyCode == 40) { 
+           currentRow++;
+           ChangeCurrentCell();
+           return false;
+        }
+    });
+//    Functions to fill in cells from Django input
     {% for entry in entries %}
         $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{currency.symbol}}"+"{{entry.amount}}".replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"))
     {% endfor %}
+//    Functions to warn if leaving and changes made
     $('input').change(function() {
         if( $(this).val() != "" ){
             window.onbeforeunload = function(e) {
