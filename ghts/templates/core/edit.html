@@ -10,13 +10,83 @@
             table input {border:none;height:100%;width:100%;}
             div.titleWrap {width:100%;float:left;}
             .titleWrap h2 {float:left;}
+            div#instructions{width:50%;min-width:600px;}
+            #instructTitle{cursor:pointer;font-size:12px;}
+            .save{margin-top:5px;}
+            .warning{color:red;font-weight:bold;}
         </style>
         {% load staticfiles %}    
             <link rel=stylesheet href="{% static "core/css/info.css" %}" type="text/css">
     {% endblock %}    
     {% block content %}
     <h1>Transactions for {{contact.organisation}} in {{selected_year}}</h1>
+    <h3>Instructions to fill in the form <span onclick="$('#instructions').slideToggle()" id="instructTitle">(show/hide)</span></h3>
+    <div id="instructions"
+    {% if spreadsheet_exists or selected_year > 2016 %}
+        style="display:none;"
+    {% endif %}
+    >
     <p>
+        Information sought via this form tracks pledges made at the time of the London conference and included on the ‘Co-hosts statement annex: fundraising’, <a href="https://www.supportingsyria2016.com/news/co-hosts-statemtent-annex-fundraising/">here</a>.
+    </p>
+    <p>
+        Complete all fields on contributions (understood in the form as totalling commitments, contracted funding and disbursements) for 2016 and 2017; where information is not available, and that may be the case in particular for 2018-2020, please record that in the comments box. If no commitment/contracted funding/disbursement was made please write '0', if information is not yet available please leave blank.
+    </p>
+    <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
+<!--    <p>Before submitting the form, check the data validation fields.</p>-->
+    <p>See below the sectors classification in relation to grants and the definitions to be circulated with the form.</p>
+    <p>
+        <b>
+            Commitment 
+        </b><br/>
+        A firm obligation, expressed in writing and backed by the necessary funds, undertaken by an official donor to provide specified assistance to a recipient country government, organisation or implementing agency.
+    </p>
+
+    <p>
+        <b>
+            Contract
+        </b><br/>
+        A binding agreement signed between a donor and a recipient implementing institution, organisation or agency to implement an action. Funds can then be disbursed on this basis.
+    </p>
+    <p>
+        <b>
+            Disbursement
+        </b><br/>
+        Outgoing funds that are transferred to or placed at the disposal of a recipient implementing institution, organisation or agency, following a commitment and/or a contract.
+    </p>
+    <p>
+        <b>
+            Multi-sector
+        </b><br/>
+        In the context of sectoral disaggregation of grants, multi-sector refers primarily to the Inter-Agency Standing Committee (IASC) standard sector. This refers to projects and activities with no one dominant sector and often applies to assistance for refugees provided and/or coordinated by the UN High Commissioner for Refugees (UNHCR). 
+    </p>
+    <p>
+        <b>
+            Region
+        </b><br/>
+        In the context of the London conference, this refers to Egypt, Iraq, Jordan, Lebanon and Turkey.
+    </p>
+    <p>
+        <b>
+            The classification of sectors
+        </b> is informed by the OECD DAC sectors and purpose codes, the IASC standard sectors, and sector classifications used by specific government and multilateral donors. The sector classification seeks to align different sector classifications to the fullest extent possible under the following headings:
+    </p>
+    <ul>
+        <li>Education</li>
+        <li>Health</li>
+        <li>Water and sanitation</li>
+        <li>Governance and civil society</li>
+        <li>Social and cultural infrastructure</li>
+        <li>Economic recovery and infrastructure (including agriculture and mine action)</li>
+        <li>General budget support</li>
+        <li>Food</li>
+        <li>Coordination and support services</li>
+        <li>Protection/Human rights/Rule of law</li>
+        <li>Shelter and non-food-items</li>
+        <li>Multi-sector</li>
+        <li>Not specified</li>
+    </ul>
+    </div>
         <label>Change year:</label>
         <select id="year">
             
@@ -42,10 +112,10 @@
     {% if contact.organisation.grant_making %}
     <div class="titleWrap">
         <h2>Grants</h2>
-        <div class="info" onclick="toggle('grants')"></div>
+        <!--<div class="info" onclick="toggle('grants')"></div>
         <div class="popupWrap">
             <div class="popup" id="grants">Information on grants</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -67,10 +137,10 @@
     {% if contact.organisation.loan_making %}
     <div class="titleWrap">
         <h2>Loans - Concessional</h2>
-        <div class="info" onclick="toggle('loansC')"></div>
+        <!--<div class="info" onclick="toggle('loansC')"></div>
         <div class="popupWrap">
             <div class="popup" id="loansC">Information on loans - concessional</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -90,10 +160,10 @@
     </table>
     <div class="titleWrap">
         <h2>Loans - Non-concessional</h2>
-        <div class="info" onclick="toggle('loansN')"></div>
+        <!--<div class="info" onclick="toggle('loansN')"></div>
         <div class="popupWrap">
             <div class="popup" id="loansN">Information on loans - non-concessional</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -115,10 +185,10 @@
     {% if selected_year in facility_years and contact.organisation.government %}
     <div class="titleWrap">
         <h2>Facility contributions</h2>
-        <div class="info" onclick="toggle('facility')"></div>
+        <!--<div class="info" onclick="toggle('facility')"></div>
         <div class="popupWrap">
             <div class="popup" id="facility">Information on facility contributions</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -128,7 +198,7 @@
     {% for scode, status in statuses %}
         <tr>
             <td><b>{{status}}</b></td>
-            <td><input type="text" name="|N|{{scode}}|T|||F"/></td>
+            <td><input type="text" name="G|C|{{scode}}|T|||F"/></td>
         </tr>
     {% endfor %}
     </table>
@@ -136,10 +206,10 @@
     {% if contact.organisation.grant_making %}
     <div class="titleWrap">
         <h2>Sector contributions - grants</h2>
-        <div class="info" onclick="toggle('sectorG')"></div>
+        <!--<div class="info" onclick="toggle('sectorG')"></div>
         <div class="popupWrap">
             <div class="popup" id="sectorG">Information on sector contributions - grants</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -161,10 +231,10 @@
     {% if contact.organisation.loan_making %}
     <div class="titleWrap">
         <h2>Sector contributions - loans</h2>
-        <div class="info" onclick="toggle('sectorL')"></div>
+       <!-- <div class="info" onclick="toggle('sectorL')"></div>
         <div class="popupWrap">
             <div class="popup" id="sectorL">Information on sector contributions - loans</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -186,10 +256,10 @@
     {% if contact.organisation.grant_making %}    
     <div class="titleWrap">
         <h2>Channel contributions - grants</h2>
-        <div class="info" onclick="toggle('channel')"></div>
+       <!-- <div class="info" onclick="toggle('channel')"></div>
         <div class="popupWrap">
             <div class="popup" id="channel">Information on channel contributions - grants</div>
-        </div>
+        </div>-->
     </div>
     <table>
         <tr>
@@ -208,6 +278,9 @@
     {% endfor %}
     </table>
     {% endif %}
+        {% for warning in warnings %}
+            <p class="warning">{{warning}}</p>
+        {% endfor %}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
     <script>

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 class Currency(models.Model):
-    symbol = models.CharField(max_length=1)
+    symbol = models.CharField(max_length=10)
     iso = models.CharField(max_length=3)
     description = models.CharField(max_length=255)
     
