@@ -12,6 +12,7 @@ from django.db.models import Sum
 
 @login_required
 def edit(request,year):
+    warnings = []
     facility_years = [2016,2017]
     user = request.user
     contact = get_object_or_404(Contact,user=user)
@@ -76,7 +77,6 @@ def edit(request,year):
             cg = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey=False,sector__isnull=True)
             cg_sum = cg.values('recipient').annotate(total = Sum('amount')).order_by('recipient').exclude(channel_of_delivery="")
             cg_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in cg_sum}
-            warnings = []
             #Compare grants
             for recipient,recipient_name in recipients:
                 total_grants = 0
@@ -161,33 +161,37 @@ def csv(request,slug):
 
 @login_required
 def csv_all(request):
-    entries = Entry.objects.all()
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="all.csv"'
-    writer = csvwriter(response)
-    header = ["Organisation","Loan or grant","Concessional","Pledge or disbursement"
-              ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
-              ,"Refugee facility for Turkey","Comment"]
-    writer.writerow(header)
-    for entry in entries:
-        organisation = entry.spreadsheet.organisation
-        year = entry.spreadsheet.year
-        comment = entry.spreadsheet.comment
-        currency = entry.spreadsheet.currency
-        writer.writerow([organisation
-                         ,entry.loan_or_grant_translate()
-                         ,entry.concessional_translate()
-                         ,entry.pledge_or_disbursement_translate()
-                         ,entry.recipient_translate()
-                         ,entry.sector
-                         ,entry.channel_of_delivery_translate()
-                         ,year
-                         ,entry.amount
-                         ,currency
-                         ,entry.facility_translate()
-                         ,comment
-                         ])
-    return response
+    user = request.user
+    if user.is_staff:
+        entries = Entry.objects.all()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="all.csv"'
+        writer = csvwriter(response)
+        header = ["Organisation","Loan or grant","Concessional","Pledge or disbursement"
+                  ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
+                  ,"Refugee facility for Turkey","Comment"]
+        writer.writerow(header)
+        for entry in entries:
+            organisation = entry.spreadsheet.organisation
+            year = entry.spreadsheet.year
+            comment = entry.spreadsheet.comment
+            currency = entry.spreadsheet.currency
+            writer.writerow([organisation
+                             ,entry.loan_or_grant_translate()
+                             ,entry.concessional_translate()
+                             ,entry.pledge_or_disbursement_translate()
+                             ,entry.recipient_translate()
+                             ,entry.sector
+                             ,entry.channel_of_delivery_translate()
+                             ,year
+                             ,entry.amount
+                             ,currency
+                             ,entry.facility_translate()
+                             ,comment
+                             ])
+        return response
+    else:
+        return redirect(user.contact.organisation)
 
 def login_user(request):
     logout(request)

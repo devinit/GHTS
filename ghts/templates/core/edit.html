@@ -34,7 +34,6 @@
     </p>
     <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
 <!--    <p>Before submitting the form, check the data validation fields.</p>-->
-    <p>See below the sectors classification in relation to grants and the definitions to be circulated with the form.</p>
     <p>
         <b>
             Commitment 
@@ -66,26 +65,6 @@
         </b><br/>
         In the context of the London conference, this refers to Egypt, Iraq, Jordan, Lebanon and Turkey.
     </p>
-    <p>
-        <b>
-            The classification of sectors
-        </b> is informed by the OECD DAC sectors and purpose codes, the IASC standard sectors, and sector classifications used by specific government and multilateral donors. The sector classification seeks to align different sector classifications to the fullest extent possible under the following headings:
-    </p>
-    <ul>
-        <li>Education</li>
-        <li>Health</li>
-        <li>Water and sanitation</li>
-        <li>Governance and civil society</li>
-        <li>Social and cultural infrastructure</li>
-        <li>Economic recovery and infrastructure (including agriculture and mine action)</li>
-        <li>General budget support</li>
-        <li>Food</li>
-        <li>Coordination and support services</li>
-        <li>Protection/Human rights/Rule of law</li>
-        <li>Shelter and non-food-items</li>
-        <li>Multi-sector</li>
-        <li>Not specified</li>
-    </ul>
     </div>
         <label>Change year:</label>
         <select id="year">
@@ -219,12 +198,14 @@
             {% endfor %}
         </tr>
     {% for sector in sectors %}
+        {% if sector.loan_or_grant == "G" %}
         <tr>
             <td><b>{{sector}}</b></td>
             {% for rcode, recip in recipients %}
                 <td><input type="text" name="G|C||{{rcode}}|{{sector}}||"/></td>
             {% endfor %}
         </tr>
+        {% endif %}
     {% endfor %}
     </table>
     {% endif %}
@@ -244,12 +225,14 @@
             {% endfor %}
         </tr>
     {% for sector in sectors %}
+        {% if sector.loan_or_grant == "L" %}
         <tr>
             <td><b>{{sector}}</b></td>
             {% for rcode, recip in recipients %}
                 <td><input type="text" name="L|||{{rcode}}|{{sector}}||"/></td>
             {% endfor %}
         </tr>
+        {% endif %}
     {% endfor %}
     </table>
     {% endif %}
@@ -282,6 +265,7 @@
             <p class="warning">{{warning}}</p>
         {% endfor %}
         <button type="submit" class="save btn btn-default">Save</button>
+        <button class="export">Export previously saved data</button>
     </form>
     <script>
 //        Function to toggle the popups
@@ -377,6 +361,15 @@
             };
         }
     });
+    $( "button.export" ).change(function() {
+        if( $(this).val() != "" ){
+            window.onbeforeunload = function(e) {
+                var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+                e.returnValue = dialogText;
+                return dialogText;
+            };
+        }
+    });
     $('select:not(#year)').change(function() {
         window.onbeforeunload = function(e) {
             var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
@@ -388,6 +381,10 @@
         window.onbeforeunload = function () {
             // blank function do nothing
         };
+    });
+    $( "button.export" ).mousedown(function(){
+        var url =  "{{ contact.organisation.get_absolute_url }}";
+        window.open(url, '_blank');
     });
     </script>
     {% endblock %}
