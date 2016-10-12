@@ -11,4 +11,4 @@ RUN apt-get update
 RUN pip install -r requirements.txt
 RUN python manage.py collectstatic --noinput
 
-CMD gunicorn -w 2 -b 0.0.0.0:8080 ghts.wsgi
+CMD gunicorn -w 2 -b 0.0.0.0:9999 ghts.wsgi
