@@ -8,11 +8,7 @@ ADD ./ /src
 WORKDIR /src
 # install dependencies
 RUN apt-get update
-RUN sudo apt-get --yes --force-yes install python-pip python-dev libpq-dev postgresql postgresql-contrib
 RUN pip install -r requirements.txt
-RUN python manage.py migrate --noinput
-RUN echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'temporary')" | python manage.py shell
 RUN python manage.py collectstatic --noinput
-
 
 CMD gunicorn -w 2 -b 0.0.0.0:8080 ghts.wsgi
