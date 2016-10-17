@@ -1,6 +1,3 @@
-# To build (with development Sqlite3 db):
-docker-compose up
-
 # To build (with new Postgres Docker):
 
 docker volume create --name=ghtsdata
