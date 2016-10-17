@@ -9,4 +9,6 @@ docker-compose run web python manage.py collectstatic --noinput
 
 
 # To run:
+```bash
 docker-compose up
+```
