@@ -64,10 +64,7 @@ class Sector(models.Model):
 class Spreadsheet(models.Model):
     YEAR_CHOICES = (
         (2016,2016),
-        (2017,2017),
-        (2018,2018),
-        (2019,2019),
-        (2020,2020),
+        (2017,"2017-2020"),
     )
     year = models.IntegerField(choices=YEAR_CHOICES)
     currency = models.ForeignKey(Currency)
@@ -76,6 +73,13 @@ class Spreadsheet(models.Model):
     
     def get_absolute_url(self):
         return reverse("core.views.edit",args=[self.year])
+    
+    def year_translate(self):
+        val = self.year
+        if val is None or val=="":
+            return ""
+        else:
+            return dict(Spreadsheet.YEAR_CHOICES)[val]
     
 class Entry(models.Model):
     coordinates = models.CharField(max_length=300,editable=False)
@@ -95,9 +99,9 @@ class Entry(models.Model):
         ('S','Syria'),
         ('J','Jordan'),
         ('L','Lebanon'),
+        ('T','Turkey'),
         ('I','Iraq'),
         ('E','Egypt'),
-        ('T','Turkey'),
         ('R','Region'),
         ('N','Not defined'),
     )
@@ -109,13 +113,17 @@ class Entry(models.Model):
         ('P','Private sector'),
         ('O','Other channel of delivery'),
     )
+    FACILITY_CHOICES = (
+        ('L','Contributions relating to London Conference pledges'),
+        ('N','Contributions beyond London Conference pledges')
+    )
     loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,blank=True,null=True)
     concessional = models.BooleanField(default=True)
     pledge_or_disbursement = models.CharField(max_length=1,choices=PLEDGE_OR_DISB_CHOICES,blank=True,null=True)
     recipient = models.CharField(max_length=1,choices=RECIPIENT_CHOICES,default="N")
     channel_of_delivery = models.CharField(max_length=1,choices=DELIVERY_CHOICES,blank=True,null=True)
     sector = models.ForeignKey(Sector,blank=True,null=True)
-    refugee_facility_for_turkey = models.BooleanField(default=False)
+    refugee_facility_for_turkey = models.CharField(max_length=1,choices=FACILITY_CHOICES,blank=True,null=True)
     def loan_or_grant_lookup(self):
         val = self.coordinates.split("|")[0]
         return val
@@ -136,7 +144,7 @@ class Entry(models.Model):
         return val
     def facility_lookup(self):
         val = self.coordinates.split("|")[6]
-        return val=="F"
+        return val
     def loan_or_grant_translate(self):
         val = self.coordinates.split("|")[0]
         if val is None or val=="":
@@ -169,7 +177,10 @@ class Entry(models.Model):
             return dict(Entry.DELIVERY_CHOICES)[val]
     def facility_translate(self):
         val = self.coordinates.split("|")[6]
-        return val=="F"
+        if val is None or val=="":
+            return ""
+        else:
+            return dict(Entry.FACILITY_CHOICES)[val]
 
     class Meta:
         verbose_name_plural = "entries"
@@ -183,7 +194,7 @@ class Entry(models.Model):
             ,self.recipient if self.recipient else ""
             ,self.sector if self.sector else ""
             ,self.channel_of_delivery if self.channel_of_delivery else ""
-            ,"F" if self.refugee_facility_for_turkey else ""
+            ,self.refugee_facility_for_turkey if self.refugee_facility_for_turkey else ""
         ]
         self.coordinates = "|".join(coord_list)
         super(Entry, self).save(*args, **kwargs)

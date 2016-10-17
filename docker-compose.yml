@@ -3,6 +3,8 @@ version: '2'
 services:
   db:
     image: postgres
+    volumes:
+      - ghtsdata:/var/lib/postgresql/data
   web:
     build:
       context: .
@@ -13,3 +15,7 @@ services:
       - "9999:9999"
     depends_on:
      - db
+     
+volumes:
+  ghtsdata:
+    external: true

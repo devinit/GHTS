@@ -19,10 +19,10 @@
             <link rel=stylesheet href="{% static "core/css/info.css" %}" type="text/css">
     {% endblock %}    
     {% block content %}
-    <h1>Transactions for {{contact.organisation}} in {{selected_year}}</h1>
+    <h1>Transactions for {{contact.organisation}} in {{year_verbose}}</h1>
     <h3>Instructions to fill in the form <span onclick="$('#instructions').slideToggle()" id="instructTitle">(show/hide)</span></h3>
     <div id="instructions"
-    {% if spreadsheet_exists or selected_year > 2016 %}
+    {% if spreadsheet_exists or selected_year == 2017 %}
         style="display:none;"
     {% endif %}
     >
@@ -34,30 +34,57 @@
     </p>
     <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
 <!--    <p>Before submitting the form, check the data validation fields.</p>-->
+    {% if contact.organisation.government %}
+        <p>In the first section under grants to Turkey, please include within your figures any contributions to the Turkey Refugee Facility (TRF) which relate to pledges made at the London Conference. In the later section, please input contributions to the TRF which relate to the conference pledge and those outside the pledge in the respective boxes.</p>
+    {% endif %}
     <p>
         <b>
             Commitment 
         </b><br/>
-        A firm obligation, expressed in writing and backed by the necessary funds, undertaken by an official donor to provide specified assistance to a recipient country government, organisation or implementing agency.
+        A plan, expressed in writing and backed by the necessary funds, undertaken by an official donor to provide specified assistance to a recipient country government, organisation or implementing agency. When filling in the questionnaire, please only input under ‘committed’ those funds which have been committed by not yet contracted or disbursed.
     </p>
-
+    <p>
+        <b>
+            Concessional
+        </b><br/>
+        <i>NB definitions on these terms are being developed in consultation with MDBs and other loan donors and will be added soon.</i>
+    </p>
+    <p>
+        <b>
+            Contributions
+        </b><br/>
+        For the purpose of this questionnaire contributions refers to the sum of all funds committed, contracted and disbursed.
+    </p>
     <p>
         <b>
             Contract
         </b><br/>
-        A binding agreement signed between a donor and a recipient implementing institution, organisation or agency to implement an action. Funds can then be disbursed on this basis.
+        A binding agreement signed between a donor and a recipient implementing institution, organisation or agency to implement an action. Funds can then be disbursed on this basis. When filling in the questionnaire, please only input under ‘contracted’ those funds which have been contracted but not yet disbursed.
     </p>
     <p>
         <b>
             Disbursement
         </b><br/>
-        Outgoing funds that are transferred to or placed at the disposal of a recipient implementing institution, organisation or agency, following a commitment and/or a contract.
+        Outgoing funds that are transferred to or placed at the disposal of a recipient implementing institution, organisation or agency, following a commitment and/or a contract. For the purposes of this questionnaire, disbursed refers funds disbursed from the donor to the first level recipient not to the funds which are disbursed at the project level.
     </p>
     <p>
         <b>
             Multi-sector
         </b><br/>
-        In the context of sectoral disaggregation of grants, multi-sector refers primarily to the Inter-Agency Standing Committee (IASC) standard sector. This refers to projects and activities with no one dominant sector and often applies to assistance for refugees provided and/or coordinated by the UN High Commissioner for Refugees (UNHCR). 
+        ‘Multi-sector’ is predominantly used for multi-sector assistance to refugees. If funding is given across several sectors, then please record that in the comments box.  
+    </p>
+    <p>
+    <p>
+        <b>
+            Non-concessional
+        </b><br/>
+        <i>NB definitions on these terms are being developed in consultation with MDBs and other loan donors and will be added soon.</i>
+    </p>
+    <p>
+        <b>
+            Pledge
+        </b><br/>
+        A non-binding announcement of an intended contribution or allocation by donors. In this context, pledges refer to the London Syria conference.  
     </p>
     <p>
         <b>
@@ -65,15 +92,21 @@
         </b><br/>
         In the context of the London conference, this refers to Egypt, Iraq, Jordan, Lebanon and Turkey.
     </p>
+    <p>
+        <b>
+            Unearmarked
+        </b><br/>
+        Unearmarked refers to funding that is deliberately not directed to any particular sector. This differs from ‘sector not specified’ where details of sector-specific allocation is not available within donor reporting.
+    </p>
     </div>
         <label>Change year:</label>
         <select id="year">
             
             {% for year1, year2 in years%}
                 {% if year1 == selected_year %}
-                <option value="{{year1}}" selected="selected">{{year1}}</option>
+                <option value="{{year1}}" selected="selected">{{year2}}</option>
                 {% else %}
-                <option value="{{year1}}">{{year1}}</option>
+                <option value="{{year1}}">{{year2}}</option>
                 {% endif %}
             {% endfor %}
         </select>
@@ -82,8 +115,10 @@
     <script>
         $("#yearBtn").click(function(){
             var yearVal = $("#year").val();
-            var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
-            window.location.replace(url);
+            if (yearVal!={{selected_year}}) {
+                var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
+                window.location.replace(url);
+            };
         });
     </script>
     <form method="POST" class="transaction-form">{% csrf_token %}
@@ -163,7 +198,11 @@
     {% endif %}
     {% if selected_year in facility_years and contact.organisation.government %}
     <div class="titleWrap">
-        <h2>Facility contributions</h2>
+        <h2>Facility for Refugees in Turkey
+        {% if selected_year == 2017 %}
+            (2017)
+        {% endif %}
+        </h2>
         <!--<div class="info" onclick="toggle('facility')"></div>
         <div class="popupWrap">
             <div class="popup" id="facility">Information on facility contributions</div>
@@ -172,12 +211,16 @@
     <table>
         <tr>
             <th></th>
-            <th>Turkey</th>
+            {% for fcode, facility in facilities %}
+                <th>{{facility}}</th>
+            {% endfor %}
         </tr>
     {% for scode, status in statuses %}
         <tr>
             <td><b>{{status}}</b></td>
-            <td><input type="text" name="G|C|{{scode}}|T|||F"/></td>
+            {% for fcode, facility in facilities %}
+                <td><input type="text" name="G|C|{{scode}}|T|||{{fcode}}"/></td>
+            {% endfor %}
         </tr>
     {% endfor %}
     </table>
