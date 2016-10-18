@@ -4,14 +4,18 @@
     <link rel=stylesheet href="{% static "core/css/login.css" %}" type="text/css">
 {% endblock %}
 {% block content %}
-    <div id="container">
+        <div class="login">
+        <div id="container">
         <div id="header">
-            <h1><a href="{% url 'core.views.login_user' %}">
+            <div id="branding">
+            <h1 id="site-name"><a href="{% url 'core.views.login_user' %}">
                 User login
             </a></h1>
+            </div>
         </div>
-        <div id="content">
-            <form class="form-horizontal" name="LoginForm" action="/accounts/login/" method="post">
+        <div id="logincontent" class="colM">
+            <div id="content-main">
+            <form class="form-horizontal" name="LoginForm" action="/accounts/login/" method="post" id="login-form">
             {% csrf_token %}
             {% if next %}
                 <input type="hidden" name="next" value="{{ next }}" />
@@ -28,12 +32,12 @@
                     <input type="password" name="password" id="id_password" placeholder="Password">
                 </div>
             </div>
-            <div class="form-row">
-                <div class="submit-row">
-                    <label>&nbsp;</label><input type="submit" value="Log in" />
-                </div>
+            <div class="submit-row">
+                <label>&nbsp;</label><input type="submit" value="Log in" />
             </div>
             </form>
         </div>
-    </div>
+        </div>
+        </div>
+        </div>
 {% endblock %}

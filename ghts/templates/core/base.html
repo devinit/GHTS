@@ -4,44 +4,40 @@
             <title>
                 {% block title %}{% endblock %}
             </title>
-            <style>
-                div#nav{width:100%;font-weight:bold;padding-bottom:20px;}
-                div#user-tools{text-align:right;width:50%;float:left;padding:0px;}
-                div#home{width:50%;float:left;padding:0px;}
-                div#meta-content{width:100%}
-            </style>
             {% block head %}
             {% endblock %}
             {% load staticfiles %}    
-            <link rel=stylesheet href="{% static "core/css/login.css" %}" type="text/css">
+            <link rel=stylesheet href="{% static "core/css/base.css" %}" type="text/css">
             <script type="text/javascript" src='{% static 'core/js/jquery.js' %}'></script>
             </head>
-        <body style="background-color: #fff;">
+        <body class="dashboard">
+        <div id="container" data-admin-utc-offset="0">
             <!-- Header -->
-    <div id="nav">
-        <div id="home">
-            <a href="{% url 'core.views.index' %}">Home</a>
-        </div>
-        {% if user.is_authenticated %}
-        <div id="user-tools">
-            {% block welcome-msg %}
-                Welcome,
-                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
-            {% endblock %}
-            <a href="{% url 'core.views.edit' 2016 %}">Edit transactions</a> /
-            {% block userlinks %}
-            {% if user.is_staff %}
-                <a href="{% url 'admin:login' %}">Administration</a> /
+        <div id="header">
+            <div id="branding">
+                <h1 id="site-name">
+                    <a href="{% url 'core.views.index' %}">Home</a>
+                </h1>
+            </div>
+            {% if user.is_authenticated %}
+            <div id="user-tools">
+                {% block welcome-msg %}
+                    Welcome,
+                    <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                {% endblock %}
+                <a href="{% url 'core.views.edit' 2016 %}">Edit transactions</a> /
+                {% block userlinks %}
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:login' %}">Administration</a> /
+                {% endif %}
+                    <a href="{% url 'core.views.login_user' %}">Log out</a>
+                {% endblock %}
+            </div>
             {% endif %}
-                <a href="{% url 'core.views.login_user' %}">Log out</a>
-            {% endblock %}
         </div>
-        {% endif %}
-    </div>
-    <!-- END Header -->
-    <div id="meta-content">
-            {% block content %}
-            {% endblock %}
-    </div>
-        </body>
+        <!-- END Header -->
+                {% block content %}
+                {% endblock %}
+        </div>
+    </body>
     </html>

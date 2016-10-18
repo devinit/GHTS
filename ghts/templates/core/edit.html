@@ -7,7 +7,9 @@
                 border:1px solid black;
                 border-collapse:collapse;
                 }
-            table input {border:none;height:100%;width:100%;}
+            table input {border:none !important;height:100% !important;width:100% !important; padding:0px !important;}
+            table td{padding:0px !important;}
+            table td b{padding:8px !important;}
             div.titleWrap {width:100%;float:left;}
             .titleWrap h2 {float:left;}
             div#instructions{width:50%;min-width:600px;}
@@ -19,6 +21,7 @@
             <link rel=stylesheet href="{% static "core/css/info.css" %}" type="text/css">
     {% endblock %}    
     {% block content %}
+        <div id="content" style="width:100%">
     <h1>Transactions for {{contact.organisation}} in {{year_verbose}}</h1>
     <h3>Instructions to fill in the form <span onclick="$('#instructions').slideToggle()" id="instructTitle">(show/hide)</span></h3>
     <div id="instructions"
@@ -431,4 +434,5 @@
         window.open(url, '_blank');
     });
     </script>
+    </div>
     {% endblock %}
