@@ -44,8 +44,10 @@
     NB: Any subsequent users or revisions to the data will overwrite previously recorded information.
     </p>
     <p>
-    To select the year and the currency, please choose the relevant option in the drop-down. 
+    To select the year and the currency, please choose the relevant option in the drop-down.
+    {% if contact.organisation.government %}
     To fill in information regarding the Facility for Refugees in Turkey for 2017, please select ‘2017-2020’.
+    {% endif %}
     </p>
     <p>
     Use the comment box to add further information about data you have filled in and processes that need clarifying for ensuring an accurate reflection of your contributions.
