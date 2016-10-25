@@ -96,9 +96,9 @@ def edit(request,year):
                 if recipient in cg_sum_obj:
                     grant_channels = cg_sum_obj[recipient]
                     if total_grants>grant_channels:
-                        warnings.append("Warning: Total grants do not equal grants by channel for %s. Total grants are greater by %s" % (recipient_name,(total_grants-grant_channels)))
+                        warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Total grants are greater by %s" % (recipient_name,(total_grants-grant_channels)))
                     if total_grants<grant_channels:
-                        warnings.append("Warning: Total grants do not equal grants by channel for %s. Grants by channel are greater by %s" % (recipient_name,(grant_channels-total_grants)))
+                        warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Grants by channel of delivery are greater by %s" % (recipient_name,(grant_channels-total_grants)))
             #Loans table (both concessional and non-concessional)
             lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True)
             lt_sum = lt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
@@ -139,7 +139,7 @@ def csv(request,slug):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="'+slug+'.csv"'
     writer = csvwriter(response)
-    header = ["Organisation","Loan or grant","Concessional","Pledge or disbursement"
+    header = ["Organisation","Loan or grant","Concessional","Status"
               ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
               ,"Refugee facility for Turkey","Comment"]
     writer.writerow(header)
@@ -170,7 +170,7 @@ def csv_all(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="all.csv"'
         writer = csvwriter(response)
-        header = ["Organisation","Loan or grant","Concessional","Pledge or disbursement"
+        header = ["Organisation","Loan or grant","Concessional","Status"
                   ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
                   ,"Refugee facility for Turkey","Comment"]
         writer.writerow(header)
