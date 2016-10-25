@@ -205,8 +205,8 @@ class Entry(models.Model):
         self.pledge_or_disbursement =  self.pledge_or_disbursement_lookup()
         self.recipient = self.recipient_lookup()
         self.channel_of_delivery = self.channel_of_delivery_lookup()
-        if Sector.objects.filter(name=self.sector_lookup()).exists():
-            self.sector = Sector.objects.get(name=self.sector_lookup())
+        if Sector.objects.filter(name=self.sector_lookup(),loan_or_grant=self.loan_or_grant_lookup()).exists():
+            self.sector = Sector.objects.get(name=self.sector_lookup(),loan_or_grant=self.loan_or_grant_lookup())
         self.refugee_facility_for_turkey = self.facility_lookup()
         super(Entry, self).save(*args, **kwargs)
 
