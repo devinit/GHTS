@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import SpreadsheetForm
 from .util import *
 from django.db.models import Sum
+from itertools import chain, groupby
 
 @login_required
 def edit(request,year):
@@ -19,9 +20,13 @@ def edit(request,year):
     organisation = contact.organisation
     recipients = Entry.RECIPIENT_CHOICES
     statuses = Entry.PLEDGE_OR_DISB_CHOICES
-    sectors = organisation.sectors.all()
-    if not sectors:
+    if not organisation.sectors.all():
         sectors = Sector.objects.filter(default=True)
+    else:
+        organisationSectors = organisation.sectors.all()
+        defaultGrantSectors = Sector.objects.filter(default=True,loan_or_grant="G")
+        unionSectors = organisationSectors | defaultGrantSectors
+        sectors = unionSectors.distinct()
     channels = Entry.DELIVERY_CHOICES
     facilities = Entry.FACILITY_CHOICES
     years = Spreadsheet.YEAR_CHOICES
