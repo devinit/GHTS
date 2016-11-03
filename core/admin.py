@@ -10,6 +10,7 @@ class OrganisationAdmin(admin.ModelAdmin):
     list_display = ['name','grant_making','loan_making','government']
     inlines = [ContactInline,]
     prepopulated_fields = {'slug': ('name',), }
+    filter_horizontal = ('sectors',)
     #enable the save buttons on top of change form
     save_on_top = True
     
@@ -29,9 +30,17 @@ class ContactAdmin(admin.ModelAdmin):
     
 class SectorAdmin(admin.ModelAdmin):
     #fields display on change list
-    list_display = ['name','loan_or_grant']
+    list_display = ['name','loan_or_grant','default']
     #enable the save buttons on top of change form
     save_on_top = True
+    # normaluser_fields = ('name','loan_or_grant',)
+    # superuser_fields = ('default',)
+    # def get_form(self, request, obj=None, **kwargs):                             
+    #     if request.user.is_superuser:                                            
+    #         self.fields = self.normaluser_fields + self.superuser_fields         
+    #     else:                                                                    
+    #         self.fields = self.normaluser_fields
+    #     return super(SectorAdmin, self).get_form(request, obj, **kwargs)
     
 class SpreadsheetAdmin(admin.ModelAdmin):
     #fields display on change list

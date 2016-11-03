@@ -15,6 +15,26 @@ class Currency(models.Model):
     
     def __str__(self):
         return self.iso
+    
+class Sector(models.Model):
+    name = models.CharField(max_length=255)
+    LOAN_OR_GRANT_CHOICES = (
+        ('L','Loan'),
+        ('G','Grant'),
+    )
+    loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,default='G')
+    default = models.BooleanField(default=False)
+    def loan_verbose(self):
+        return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
+    
+    def __unicode__(self):
+        return u'%s' % self.name
+    
+    def save(self, *args, **kwargs):
+        super(Sector, self).save(*args, **kwargs)
+        if self.name:
+            self.name = self.name.replace('"',"'")
+        super(Sector, self).save(*args, **kwargs)
 
 class Organisation(models.Model):
     name = models.CharField(max_length=255,unique=True)
@@ -22,6 +42,7 @@ class Organisation(models.Model):
     grant_making = models.BooleanField(default=True)
     loan_making = models.BooleanField(default=True)
     government = models.BooleanField(default=True)
+    sectors = models.ManyToManyField(Sector,related_name="sectors",related_query_name="sector",blank=True)
     
     class Meta:
         ordering = ['name']
@@ -41,25 +62,6 @@ class Contact(models.Model):
     
     def __unicode__(self):
         return u'%s' % self.user.get_full_name()
-    
-class Sector(models.Model):
-    name = models.CharField(max_length=255)
-    LOAN_OR_GRANT_CHOICES = (
-        ('L','Loan'),
-        ('G','Grant'),
-    )
-    loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,default='G')
-    def loan_verbose(self):
-        return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
-    
-    def __unicode__(self):
-        return u'%s' % self.name
-    
-    def save(self, *args, **kwargs):
-        super(Sector, self).save(*args, **kwargs)
-        if self.name:
-            self.name = self.name.replace('"',"'")
-        super(Sector, self).save(*args, **kwargs)
     
 class Spreadsheet(models.Model):
     YEAR_CHOICES = (

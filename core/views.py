@@ -19,7 +19,9 @@ def edit(request,year):
     organisation = contact.organisation
     recipients = Entry.RECIPIENT_CHOICES
     statuses = Entry.PLEDGE_OR_DISB_CHOICES
-    sectors = Sector.objects.all()
+    sectors = organisation.sectors.all()
+    if not sectors:
+        sectors = Sector.objects.filter(default=True)
     channels = Entry.DELIVERY_CHOICES
     facilities = Entry.FACILITY_CHOICES
     years = Spreadsheet.YEAR_CHOICES
