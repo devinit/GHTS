@@ -51,6 +51,9 @@ class Organisation(models.Model):
         return u'%s' % self.name
     
     def get_absolute_url(self):
+        return reverse("core.views.adminEdit",args=[self.slug,2016])
+    
+    def get_export_url(self):
         return reverse("core.views.csv",args=[self.slug])
 
 class Contact(models.Model):

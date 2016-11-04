@@ -131,7 +131,131 @@ def edit(request,year):
             entries = []
             currency = []
             spreadsheet_exists = False
-    return render(request,'core/edit.html', {"warnings":warnings,"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"facilities":facilities,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"year_verbose":year_verbose,"currency":currency,"facility_years":facility_years,"spreadsheet_exists":spreadsheet_exists})
+    return render(request,'core/edit-locked.html', {"warnings":warnings,"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"facilities":facilities,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"year_verbose":year_verbose,"currency":currency,"facility_years":facility_years,"spreadsheet_exists":spreadsheet_exists})
+
+@login_required
+def adminEdit(request,slug,year):
+    warnings = []
+    facility_years = [2016,2017]
+    user = request.user
+    if not user.is_staff:
+        return redirect("core.views.edit",year=year)
+    contact = get_object_or_404(Contact,user=user)
+    organisation = Organisation.objects.get(slug=slug)
+    recipients = Entry.RECIPIENT_CHOICES
+    statuses = Entry.PLEDGE_OR_DISB_CHOICES
+    if not organisation.sectors.all():
+        sectors = Sector.objects.filter(default=True)
+    else:
+        organisationSectors = organisation.sectors.all()
+        defaultGrantSectors = Sector.objects.filter(default=True,loan_or_grant="G")
+        unionSectors = organisationSectors | defaultGrantSectors
+        sectors = unionSectors.distinct()
+    channels = Entry.DELIVERY_CHOICES
+    facilities = Entry.FACILITY_CHOICES
+    years = Spreadsheet.YEAR_CHOICES
+    year = int(year)
+    year_verbose = dict(years)[year]
+    if request.method == "POST":
+        form = SpreadsheetForm(request.POST)
+        queryDict = request.POST
+        comment = queryDict.get('comment')
+        if not Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
+            spreadsheet = form.save(commit=False)
+            spreadsheet.year = year
+            spreadsheet.organisation = organisation
+            spreadsheet.save()
+        else:
+            spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
+            form = SpreadsheetForm(request.POST,instance=spreadsheet)
+            spreadsheet = form.save()
+        excludeKeys = ["currency","comment","csrfmiddlewaretoken"]
+        for key, value in queryDict.iteritems():
+            if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
+                entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
+                if safeFloat(value)>=0:
+                    entry.amount = safeFloat(value)
+                    entry.save_reverse()
+                else:
+                    entry.delete()
+            elif key not in excludeKeys and value!="":
+                entry = Entry()
+                entry.spreadsheet = spreadsheet
+                entry.coordinates = key
+                if safeFloat(value)>=0:
+                    entry.amount = safeFloat(value)
+                    entry.save_reverse()
+        return redirect(spreadsheet)
+    else:
+        if Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
+            spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
+            form = SpreadsheetForm(instance=spreadsheet)
+            entries = Entry.objects.filter(spreadsheet=spreadsheet)
+            currency = spreadsheet.currency
+            spreadsheet_exists = True
+            #Validate sums here
+            #Grants table
+            gt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",channel_of_delivery="",sector__isnull=True)
+            gt_sum = gt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
+            gt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in gt_sum} 
+            #Facilities contributions
+            # fc = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey=True)
+            # fc_sum = fc.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
+            # fc_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in fc_sum} 
+            #Sector grants
+            sg = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",channel_of_delivery="",sector__isnull=False)
+            sg_sum = sg.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
+            sg_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in sg_sum} 
+            #Channel grants
+            cg = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",sector__isnull=True)
+            cg_sum = cg.values('recipient').annotate(total = Sum('amount')).order_by('recipient').exclude(channel_of_delivery="")
+            cg_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in cg_sum}
+            #Compare grants
+            for recipient,recipient_name in recipients:
+                total_grants = 0
+                if recipient in gt_sum_obj:
+                    total_grants = total_grants + gt_sum_obj[recipient]
+                # Facility contributions no longer need to add to total grants
+                # if recipient in fc_sum_obj:
+                #     total_grants = total_grants + fc_sum_obj[recipient]
+                if recipient in sg_sum_obj:
+                    grant_sectors = sg_sum_obj[recipient]
+                    if total_grants>grant_sectors:
+                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Total grants are greater by %s" % (recipient_name,(total_grants-grant_sectors)))
+                    if total_grants<grant_sectors:
+                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Grants by sector are greater by %s" % (recipient_name,(grant_sectors-total_grants)))
+                if recipient in cg_sum_obj:
+                    grant_channels = cg_sum_obj[recipient]
+                    if total_grants>grant_channels:
+                        warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Total grants are greater by %s" % (recipient_name,(total_grants-grant_channels)))
+                    if total_grants<grant_channels:
+                        warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Grants by channel of delivery are greater by %s" % (recipient_name,(grant_channels-total_grants)))
+            #Loans table (both concessional and non-concessional)
+            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True)
+            lt_sum = lt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
+            lt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in lt_sum} 
+            #Sector loans
+            sl = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=False)
+            sl_sum = sl.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
+            sl_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in sl_sum} 
+            #Compare loans
+            for recipient,recipient_name in recipients:
+                total_loans = 0
+                if recipient in lt_sum_obj:
+                    total_loans = total_loans + lt_sum_obj[recipient]
+                if recipient in sl_sum_obj:
+                    loan_sectors = sl_sum_obj[recipient]
+                    if total_loans>loan_sectors:
+                        warnings.append("Warning: Total loans (concessional and non-concessional) do not equal loans by sector for %s. Total loans are greater by %s" % (recipient_name,(total_loans-loan_sectors)))
+                    if total_loans<loan_sectors:
+                        warnings.append("Warning: Total loans (concessional and non-concessional) do not equal loans by sector for %s. Loans by sector are greater by %s" % (recipient_name,(loan_sectors-total_loans)))
+                
+        else:
+            form = SpreadsheetForm()
+            entries = []
+            currency = []
+            spreadsheet_exists = False
+    return render(request,'core/edit.html', {"warnings":warnings,"user":user,"contact":contact,"organisation":organisation,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"facilities":facilities,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"year_verbose":year_verbose,"currency":currency,"facility_years":facility_years,"spreadsheet_exists":spreadsheet_exists})
 
 @login_required
 def index(request):

@@ -1,0 +1,476 @@
+{% extends 'core/base.html' %}
+
+    {% block title %} Edit transactions {% endblock %}
+    {% block head %}
+        <style>
+            table, tr, th, td {
+                border:1px solid black;
+                border-collapse:collapse;
+                }
+            table input {border:none !important;height:100% !important;width:100% !important; padding:0px !important;}
+            table td{padding:0px !important;}
+            table td b{padding:8px !important;}
+            div.titleWrap {width:100%;float:left;}
+            .titleWrap h2 {float:left;}
+            div#instructions{width:50%;min-width:600px;}
+            #instructTitle{cursor:pointer;font-size:12px;}
+            .save{margin-top:5px;}
+            .warning{color:red;font-weight:bold;}
+        </style>
+        {% load staticfiles %}    
+            <link rel=stylesheet href="{% static "core/css/info.css" %}" type="text/css">
+    {% endblock %}    
+    {% block content %}
+        <div id="content" style="width:100%">
+    <h1>Transactions for {{contact.organisation}} in {{year_verbose}}</h1>
+    <h3>Instructions to fill in the form <span onclick="$('#instructions').slideToggle()" id="instructTitle">(show/hide)</span></h3>
+    <div id="instructions"
+    {% if spreadsheet_exists or selected_year == 2017 %}
+        style="display:none;"
+    {% endif %}
+    >
+    <p>
+        Information sought via this form tracks pledges made at the time of the London conference and included on the ‘Co-hosts statement annex: fundraising’, <a href="https://www.supportingsyria2016.com/news/co-hosts-statemtent-annex-fundraising/">here</a>.
+    </p>
+    <p>
+        Complete all fields on contributions (comprised of commitments, contracted funding and disbursements). If no commitment/contracted funding/disbursement was made please write '0'. If information is not yet available please leave blank.
+    </p>
+    <p>
+        Please note: pledge data has been pre-filled for your organisation and cannot be edited on this form.
+    </p>
+    <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
+<!--    <p>Before submitting the form, check the data validation fields.</p>-->
+    {% if contact.organisation.government %}
+        <p>In the first section under grants to Turkey, please include within your figures any contributions to the Facility for Refugees in Turkey (TRF) which relate to pledges made at the London Conference. In the later section, please input contributions to the TRF which relate to the conference pledge and those outside the pledge in the respective boxes.</p>
+    {% endif %}
+    <p>
+    NB: Any subsequent users or revisions to the data will overwrite previously recorded information.
+    </p>
+    <p>
+    To select the year and the currency, please choose the relevant option in the drop-down.
+    {% if contact.organisation.government %}
+    To fill in information regarding the Facility for Refugees in Turkey for 2017, please select ‘2017-2020’.
+    {% endif %}
+    </p>
+    <p>
+    Use the comment box to add further information about data you have filled in and processes that need clarifying to ensure an accurate reflection of your contributions.
+    </p>
+    <p>
+    To save and submit your data, press ‘Save’ at the bottom of the page.
+    In order to check your data, press ‘Export previously saved data’.
+    </p>
+    <p>
+    Email <a href="mailto:syriatracking@devinit.org">syriatracking@devinit.org</a> for any clarifications or if you have any issues. 
+    </p>
+    <h3>Key definitions:</h3>
+    <p>
+        <b>
+            Commitment 
+        </b><br/>
+        A plan, expressed in writing and backed by the necessary funds, undertaken by an official donor to provide specified assistance to a recipient country government, organisation or implementing agency. When filling in the form, please only input under ‘committed’ those funds which have been committed by not yet contracted or disbursed.
+    </p>
+    <p>
+        <b>
+            Concessional
+        </b><br/>
+        <i>NB definitions on these terms are being developed in consultation with MDBs and other loan donors and will be added soon.</i>
+    </p>
+    <p>
+        <b>
+            Contributions
+        </b><br/>
+        For the purpose of this form, contributions refers to the sum of all funds committed, contracted and disbursed.
+    </p>
+    <p>
+        <b>
+            Contract
+        </b><br/>
+        A binding agreement signed between a donor and a recipient implementing institution, organisation or agency to implement an action. Funds can then be disbursed on this basis. When filling in the form, please only input under ‘contracted’ those funds which have been contracted but not yet disbursed.
+    </p>
+    <p>
+        <b>
+            Disbursement
+        </b><br/>
+        Outgoing funds that are transferred to or placed at the disposal of a recipient implementing institution, organisation or agency, following a commitment and/or a contract. For the purposes of this form, disbursed refers funds disbursed from the donor to the first level recipient not to the funds which are disbursed at the project level.
+    </p>
+    <p>
+        <b>
+            Multi-sector
+        </b><br/>
+        ‘Multi-sector’ is predominantly used for multi-sector assistance to refugees. If funding is given across several sectors, then please record that in the comments box.  
+    </p>
+    <p>
+    <p>
+        <b>
+            Non-concessional
+        </b><br/>
+        <i>NB definitions on these terms are being developed in consultation with MDBs and other loan donors and will be added soon.</i>
+    </p>
+    <p>
+        <b>
+            Pledge
+        </b><br/>
+        A non-binding announcement of an intended contribution or allocation by donors. In this context, pledges refer to the London Syria conference.  
+    </p>
+    <p>
+        <b>
+            Region
+        </b><br/>
+        In the context of the London conference, this refers to Egypt, Iraq, Jordan, Lebanon and Turkey.
+    </p>
+    <p>
+        <b>
+            Unearmarked
+        </b><br/>
+        Unearmarked refers to funding that is deliberately not directed to any particular sector. This differs from ‘sector not specified’ where details of sector-specific allocation is not available within donor reporting.
+    </p>
+    </div>
+        <label>Change year:</label>
+        <select id="year">
+            
+            {% for year1, year2 in years%}
+                {% if year1 == selected_year %}
+                <option value="{{year1}}" selected="selected">{{year2}}</option>
+                {% else %}
+                <option value="{{year1}}">{{year2}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <button id="yearBtn">Go</button>
+    </p>
+    <script>
+        $("#yearBtn").click(function(){
+            var yearVal = $("#year").val();
+            if (yearVal!={{selected_year}}) {
+                var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
+                window.location.replace(url);
+            };
+        });
+    </script>
+    <form method="POST" class="transaction-form">{% csrf_token %}
+        {{ form.as_p }}
+    {% if contact.organisation.grant_making %}
+    <div class="titleWrap">
+        <h2>Grants</h2>
+        <!--<div class="info" onclick="toggle('grants')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="grants">Information on grants</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="G|C|{{scode}}|{{rcode}}|||"
+                {% if status == "Pledged" %}
+                    readonly
+                {% endif %}
+                /></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+    {% if contact.organisation.loan_making %}
+    <div class="titleWrap">
+        <h2>Concessional loans</h2>
+        <!--<div class="info" onclick="toggle('loansC')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="loansC">Information on loans - concessional</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|C|{{scode}}|{{rcode}}|||"/
+                {% if status == "Pledged" %}
+                    readonly
+                {% endif %}
+                ></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    <div class="titleWrap">
+        <h2>Non-concessional loans</h2>
+        <!--<div class="info" onclick="toggle('loansN')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="loansN">Information on loans - non-concessional</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|N|{{scode}}|{{rcode}}|||"/
+                {% if status == "Pledged" %}
+                    readonly
+                {% endif %}
+                ></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+    {% if selected_year in facility_years and contact.organisation.government %}
+    <div class="titleWrap">
+        <h2>Facility for Refugees in Turkey
+        {% if selected_year == 2017 %}
+            (2017)
+        {% endif %}
+        </h2>
+        <div class="info" onclick="toggle('facility')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="facility">Please include in the first column contributions to TRF that were part of the London conference. Please include in the second column contributions to TRF that were not part of the London conference.</div>
+        </div>
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for fcode, facility in facilities %}
+                <th>{{facility}}</th>
+            {% endfor %}
+        </tr>
+    {% for scode, status in statuses %}
+        <tr>
+            <td><b>{{status}}</b></td>
+            {% for fcode, facility in facilities %}
+                <td><input type="text" name="G|C|{{scode}}|T|||{{fcode}}"/
+                {% if status == "Pledged" %}
+                    readonly
+                {% endif %}
+                ></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+    {% if contact.organisation.grant_making %}
+    <div class="titleWrap">
+        <h2>Grant contributions by sector</h2>
+        <!--<div class="info" onclick="toggle('sectorG')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="sectorG">Information on sector contributions - grants</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for sector in sectors %}
+        {% if sector.loan_or_grant == "G" %}
+        <tr>
+            <td><b>{{sector}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="G|C||{{rcode}}|{{sector}}||"/></td>
+            {% endfor %}
+        </tr>
+        {% endif %}
+    {% endfor %}
+    </table>
+    {% endif %}
+    {% if contact.organisation.loan_making %}
+    <div class="titleWrap">
+        <h2>Loan contributions by sector</h2>
+       <!-- <div class="info" onclick="toggle('sectorL')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="sectorL">Information on sector contributions - loans</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for sector in sectors %}
+        {% if sector.loan_or_grant == "L" %}
+        <tr>
+            <td><b>{{sector}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|||{{rcode}}|{{sector}}||"/></td>
+            {% endfor %}
+        </tr>
+        {% endif %}
+    {% endfor %}
+    </table>
+    {% endif %}
+    {% if contact.organisation.grant_making %}    
+    <div class="titleWrap">
+        <h2>Grant contributions by channel of delivery</h2>
+       <!-- <div class="info" onclick="toggle('channel')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="channel">Information on channel contributions - grants</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for ccode, channel in channels %}
+        <tr>
+            <td><b>{{channel}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="G|C||{{rcode}}||{{ccode}}|"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+        {% for warning in warnings %}
+            <p class="warning">{{warning}}</p>
+        {% endfor %}
+        <button type="submit" class="save btn btn-default">Save</button>
+        <button class="export">Export previously saved data</button>
+    </form>
+    <script>
+//        Function to toggle the popups
+    toggle = function(selector){
+        $(".popup#"+selector).slideToggle()
+    };
+//    Functions to control Excel-like arrowkeying
+    var currentRow = 1;
+    var currentCell = 1;
+    var trLen = $('tr').length - 1;
+    var tdMax = 0
+    $('tr').each(function(i,e){
+        var tdCount = e.getElementsByTagName('td').length - 1;
+        if (tdCount>tdMax) {
+            tdMax = tdCount
+        };
+    });
+
+    function ChangeCurrentCell() {
+        if (currentRow<1) {
+            currentRow = 1;
+        }
+        if (currentCell<1) {
+            currentCell = 1;
+        }
+        if (currentRow>trLen) {
+            currentRow = trLen;
+        }
+        if (currentCell>tdMax) {
+            currentCell=tdMax
+        }
+        var tableRow = $('tr')[currentRow];
+        var tableCell = tableRow.children[currentCell];
+        if (tableCell!==undefined) {
+            var cellInput = tableCell.getElementsByTagName("input");
+            if (cellInput.length>0) {
+                cellInput[0].focus();
+                cellInput[0].select();
+            };
+        };
+    };
+    function GetCurrentCell() {
+        var activeElement = document.activeElement;
+        var tableCell = activeElement.parentElement;
+        var tableRow = tableCell.parentElement;
+        currentCell = Array.prototype.indexOf.call(tableRow.children, tableCell);
+        currentRow = Array.prototype.indexOf.call($('tr'), tableRow);
+    }
+    $('input').on("focus",GetCurrentCell);
+
+    $(document).keydown(function(e){
+        if (e.keyCode == 37) { 
+           currentCell--;
+           ChangeCurrentCell();
+           return false;
+        }
+        if (e.keyCode == 38) { 
+           currentRow--;
+           ChangeCurrentCell();
+           return false;
+        }
+        if (e.keyCode == 39) { 
+           currentCell++;
+           ChangeCurrentCell();
+           return false;
+        }
+        if (e.keyCode == 40) { 
+           currentRow++;
+           ChangeCurrentCell();
+           return false;
+        }
+    });
+//    Functions to fill in cells from Django input
+    {% for entry in entries %}
+        $( "input[name='{{entry.coordinates}}']" ).val("{{entry.amount}}"=="None"?"":"{{currency.symbol}}"+"{{entry.amount}}".replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"))
+    {% endfor %}
+//    Functions to warn if leaving and changes made
+    $('input').change(function() {
+        if( $(this).val() != "" ){
+            window.onbeforeunload = function(e) {
+                var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+                e.returnValue = dialogText;
+                return dialogText;
+            };
+        }
+    });
+    $('textarea').change(function() {
+        if( $(this).val() != "" ){
+            window.onbeforeunload = function(e) {
+                var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+                e.returnValue = dialogText;
+                return dialogText;
+            };
+        }
+    });
+    $( "button.export" ).change(function() {
+        if( $(this).val() != "" ){
+            window.onbeforeunload = function(e) {
+                var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+                e.returnValue = dialogText;
+                return dialogText;
+            };
+        }
+    });
+    $('select:not(#year)').change(function() {
+        window.onbeforeunload = function(e) {
+            var dialogText = 'Do you want to leave this site? Changes that you made may not be saved.';
+            e.returnValue = dialogText;
+            return dialogText;
+        };
+    });
+    $( "button[type='submit']" ).click(function(){
+        window.onbeforeunload = function () {
+            // blank function do nothing
+        };
+    });
+    $( "button.export" ).mousedown(function(){
+        var url =  "{{ contact.organisation.get_export_url }}";
+        window.open(url, '_blank');
+    });
+    </script>
+    </div>
+    {% endblock %}

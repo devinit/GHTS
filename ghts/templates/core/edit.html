@@ -22,7 +22,7 @@
     {% endblock %}    
     {% block content %}
         <div id="content" style="width:100%">
-    <h1>Transactions for {{contact.organisation}} in {{year_verbose}}</h1>
+    <h1>Transactions for {{organisation}} in {{year_verbose}}</h1>
     <h3>Instructions to fill in the form <span onclick="$('#instructions').slideToggle()" id="instructTitle">(show/hide)</span></h3>
     <div id="instructions"
     {% if spreadsheet_exists or selected_year == 2017 %}
@@ -37,7 +37,7 @@
     </p>
     <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
 <!--    <p>Before submitting the form, check the data validation fields.</p>-->
-    {% if contact.organisation.government %}
+    {% if organisation.government %}
         <p>In the first section under grants to Turkey, please include within your figures any contributions to the Facility for Refugees in Turkey (TRF) which relate to pledges made at the London Conference. In the later section, please input contributions to the TRF which relate to the conference pledge and those outside the pledge in the respective boxes.</p>
     {% endif %}
     <p>
@@ -45,7 +45,7 @@
     </p>
     <p>
     To select the year and the currency, please choose the relevant option in the drop-down.
-    {% if contact.organisation.government %}
+    {% if organisation.government %}
     To fill in information regarding the Facility for Refugees in Turkey for 2017, please select ‘2017-2020’.
     {% endif %}
     </p>
@@ -139,14 +139,14 @@
         $("#yearBtn").click(function(){
             var yearVal = $("#year").val();
             if (yearVal!={{selected_year}}) {
-                var url =  "{% url 'core.views.edit' 2016 %}".replace("2016",yearVal);
+                var url =  "{% url 'core.views.adminEdit' organisation.slug 2016 %}".replace("2016",yearVal);
                 window.location.replace(url);
             };
         });
     </script>
     <form method="POST" class="transaction-form">{% csrf_token %}
         {{ form.as_p }}
-    {% if contact.organisation.grant_making %}
+    {% if organisation.grant_making %}
     <div class="titleWrap">
         <h2>Grants</h2>
         <!--<div class="info" onclick="toggle('grants')"></div>
@@ -171,7 +171,7 @@
     {% endfor %}
     </table>
     {% endif %}
-    {% if contact.organisation.loan_making %}
+    {% if organisation.loan_making %}
     <div class="titleWrap">
         <h2>Concessional loans</h2>
         <!--<div class="info" onclick="toggle('loansC')"></div>
@@ -219,7 +219,7 @@
     {% endfor %}
     </table>
     {% endif %}
-    {% if selected_year in facility_years and contact.organisation.government %}
+    {% if selected_year in facility_years and organisation.government %}
     <div class="titleWrap">
         <h2>Facility for Refugees in Turkey
         {% if selected_year == 2017 %}
@@ -248,7 +248,7 @@
     {% endfor %}
     </table>
     {% endif %}
-    {% if contact.organisation.grant_making %}
+    {% if organisation.grant_making %}
     <div class="titleWrap">
         <h2>Grant contributions by sector</h2>
         <!--<div class="info" onclick="toggle('sectorG')"></div>
@@ -275,7 +275,7 @@
     {% endfor %}
     </table>
     {% endif %}
-    {% if contact.organisation.loan_making %}
+    {% if organisation.loan_making %}
     <div class="titleWrap">
         <h2>Loan contributions by sector</h2>
        <!-- <div class="info" onclick="toggle('sectorL')"></div>
@@ -302,7 +302,7 @@
     {% endfor %}
     </table>
     {% endif %}
-    {% if contact.organisation.grant_making %}    
+    {% if organisation.grant_making %}    
     <div class="titleWrap">
         <h2>Grant contributions by channel of delivery</h2>
        <!-- <div class="info" onclick="toggle('channel')"></div>
@@ -449,7 +449,7 @@
         };
     });
     $( "button.export" ).mousedown(function(){
-        var url =  "{{ contact.organisation.get_absolute_url }}";
+        var url =  "{{ organisation.get_export_url }}";
         window.open(url, '_blank');
     });
     </script>
