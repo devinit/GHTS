@@ -35,9 +35,6 @@
     <p>
         Complete all fields on contributions (comprised of commitments, contracted funding and disbursements). If no commitment/contracted funding/disbursement was made please write '0'. If information is not yet available please leave blank.
     </p>
-    <p>
-        Please note: pledge data has been pre-filled for your organisation and cannot be edited on this form.
-    </p>
     <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
 <!--    <p>Before submitting the form, check the data validation fields.</p>-->
     {% if contact.organisation.government %}
@@ -170,7 +167,6 @@
             {% for rcode, recip in recipients %}
                 <td><input type="text" name="G|C|{{scode}}|{{rcode}}|||"
                 {% if status == "Pledged" %}
-                    readonly
                 {% endif %}
                 /></td>
             {% endfor %}
@@ -199,7 +195,6 @@
             {% for rcode, recip in recipients %}
                 <td><input type="text" name="L|C|{{scode}}|{{rcode}}|||"/
                 {% if status == "Pledged" %}
-                    readonly
                 {% endif %}
                 ></td>
             {% endfor %}
@@ -226,7 +221,6 @@
             {% for rcode, recip in recipients %}
                 <td><input type="text" name="L|N|{{scode}}|{{rcode}}|||"/
                 {% if status == "Pledged" %}
-                    readonly
                 {% endif %}
                 ></td>
             {% endfor %}
@@ -259,7 +253,6 @@
             {% for fcode, facility in facilities %}
                 <td><input type="text" name="G|C|{{scode}}|T|||{{fcode}}"/
                 {% if status == "Pledged" %}
-                    readonly
                 {% endif %}
                 ></td>
             {% endfor %}
