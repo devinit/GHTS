@@ -107,6 +107,7 @@ class Entry(models.Model):
         ('T','Turkey'),
         ('I','Iraq'),
         ('E','Egypt'),
+        ('M','Multi-country'),
         ('R','Region'),
         ('N','Not defined'),
     )
