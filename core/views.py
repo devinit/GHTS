@@ -185,6 +185,7 @@ def adminEdit(request,slug,year):
                 if safeFloat(value)>=0:
                     entry.amount = safeFloat(value)
                     entry.save_reverse()
+        return redirect("core.views.adminEdit",slug=slug,year=year)
     else:
         if Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
