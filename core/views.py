@@ -71,11 +71,11 @@ def edit(request,year):
             spreadsheet_exists = True
             #Validate sums here
             #Grants table
-            gt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",channel_of_delivery="",sector__isnull=True)
+            gt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",channel_of_delivery="",sector__isnull=True).exclude(pledge_or_disbursement="P")
             gt_sum = gt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             gt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in gt_sum} 
             #Facilities contributions
-            # fc = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey=True)
+            # fc = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey=True).exclude(pledge_or_disbursement="P")
             # fc_sum = fc.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             # fc_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in fc_sum} 
             #Sector grants
@@ -107,7 +107,7 @@ def edit(request,year):
                     if total_grants<grant_channels:
                         warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Grants by channel of delivery are greater by %s" % (recipient_name,(grant_channels-total_grants)))
             #Loans table (both concessional and non-concessional)
-            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True)
+            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True).exclude(pledge_or_disbursement="P")
             lt_sum = lt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             lt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in lt_sum} 
             #Sector loans
@@ -185,7 +185,7 @@ def adminEdit(request,slug,year):
                 if safeFloat(value)>=0:
                     entry.amount = safeFloat(value)
                     entry.save_reverse()
-        return redirect(spreadsheet)
+        return redirect("core.views.edit",slug=slug,year=year)
     else:
         if Spreadsheet.objects.filter(organisation=organisation,year=year).exists():
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year=year)
@@ -195,11 +195,11 @@ def adminEdit(request,slug,year):
             spreadsheet_exists = True
             #Validate sums here
             #Grants table
-            gt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",channel_of_delivery="",sector__isnull=True)
+            gt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey="",channel_of_delivery="",sector__isnull=True).exclude(pledge_or_disbursement="P")
             gt_sum = gt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             gt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in gt_sum} 
             #Facilities contributions
-            # fc = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey=True)
+            # fc = entries.filter(spreadsheet=spreadsheet,loan_or_grant="G",concessional=True,refugee_facility_for_turkey=True).exclude(pledge_or_disbursement="P")
             # fc_sum = fc.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             # fc_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in fc_sum} 
             #Sector grants
@@ -231,7 +231,7 @@ def adminEdit(request,slug,year):
                     if total_grants<grant_channels:
                         warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Grants by channel of delivery are greater by %s" % (recipient_name,(grant_channels-total_grants)))
             #Loans table (both concessional and non-concessional)
-            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True)
+            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True).exclude(pledge_or_disbursement="P")
             lt_sum = lt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             lt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in lt_sum} 
             #Sector loans
