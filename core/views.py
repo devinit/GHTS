@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
 from core.models import Organisation, Contact, Sector, Currency, Spreadsheet, Entry
-from csv import writer as csvwriter
+from unicodecsv import writer as csvwriter
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.http import *
@@ -269,7 +269,7 @@ def csv(request,slug):
     entries = Entry.objects.filter(spreadsheet__in=spreadsheets)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="'+slug+'.csv"'
-    writer = csvwriter(response)
+    writer = csvwriter(response,encoding='utf-8')
     header = ["Organisation","Loan or grant","Concessional","Status"
               ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
               ,"Refugee facility for Turkey","Comment"]
@@ -300,7 +300,7 @@ def csv_all(request):
         entries = Entry.objects.all()
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="all.csv"'
-        writer = csvwriter(response)
+        writer = csvwriter(response,encoding='utf-8')
         header = ["Organisation","Loan or grant","Concessional","Status"
                   ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
                   ,"Refugee facility for Turkey","Comment"]
