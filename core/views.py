@@ -29,7 +29,7 @@ def edit(request,year):
         sectors = unionSectors.distinct()
     channels = Entry.DELIVERY_CHOICES
     facilities = Entry.FACILITY_CHOICES
-    years = Spreadsheet.YEAR_CHOICES
+    years = Spreadsheet.YEAR_CHOICES[-2:]
     year = int(year)
     year_verbose = dict(years)[year]
     if request.method == "POST":
@@ -272,25 +272,28 @@ def csv(request,slug):
     writer = csvwriter(response,encoding='utf-8')
     header = ["Organisation","Loan or grant","Concessional","Status"
               ,"Recipient","Sector","Channel of delivery","Year","Amount","Currency"
-              ,"Refugee facility for Turkey","Comment"]
+              # ,"Refugee facility for Turkey"
+              ,"Comment"]
     writer.writerow(header)
     for entry in entries:
         year = entry.spreadsheet.year_translate()
-        comment = entry.spreadsheet.comment
-        currency = entry.spreadsheet.currency
-        writer.writerow([organisation
-                         ,entry.loan_or_grant_translate()
-                         ,entry.concessional_translate()
-                         ,entry.pledge_or_disbursement_translate()
-                         ,entry.recipient_translate()
-                         ,entry.sector
-                         ,entry.channel_of_delivery_translate()
-                         ,year
-                         ,entry.amount
-                         ,currency
-                         ,entry.facility_translate()
-                         ,comment
-                         ])
+        #Edit here for future years
+        if year in [2017,"2018-2020"]:
+            comment = entry.spreadsheet.comment
+            currency = entry.spreadsheet.currency
+            writer.writerow([organisation
+                             ,entry.loan_or_grant_translate()
+                             ,entry.concessional_translate()
+                             ,entry.pledge_or_disbursement_translate()
+                             ,entry.recipient_translate()
+                             ,entry.sector
+                             ,entry.channel_of_delivery_translate()
+                             ,year
+                             ,entry.amount
+                             ,currency
+                             # ,entry.facility_translate()
+                             ,comment
+                             ])
     return response
 
 @login_required
