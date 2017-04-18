@@ -29,7 +29,8 @@ def edit(request,year):
         sectors = unionSectors.distinct()
     channels = Entry.DELIVERY_CHOICES
     facilities = Entry.FACILITY_CHOICES
-    years = Spreadsheet.YEAR_CHOICES[-2:]
+    years = Spreadsheet.YEAR_CHOICES
+    filtered_years = years[-2:]
     year = int(year)
     year_verbose = dict(years)[year]
     if request.method == "POST":
@@ -131,7 +132,7 @@ def edit(request,year):
             entries = []
             currency = []
             spreadsheet_exists = False
-    return render(request,'core/edit-locked.html', {"warnings":warnings,"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"facilities":facilities,"sectors":sectors,"channels":channels,"years":years,"selected_year":year,"year_verbose":year_verbose,"currency":currency,"facility_years":facility_years,"spreadsheet_exists":spreadsheet_exists})
+    return render(request,'core/edit-locked.html', {"warnings":warnings,"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"facilities":facilities,"sectors":sectors,"channels":channels,"years":filtered_years,"selected_year":year,"year_verbose":year_verbose,"currency":currency,"facility_years":facility_years,"spreadsheet_exists":spreadsheet_exists})
 
 @login_required
 def adminEdit(request,slug,year):
