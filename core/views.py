@@ -108,7 +108,7 @@ def edit(request,year):
                     if total_grants<grant_channels:
                         warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Grants by channel of delivery are greater by %s" % (recipient_name,(grant_channels-total_grants)))
             #Loans table (both concessional and non-concessional)
-            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True).exclude(pledge_or_disbursement="P")
+            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True,channel_of_delivery="").exclude(pledge_or_disbursement="P")
             lt_sum = lt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             lt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in lt_sum} 
             #Sector loans
@@ -242,7 +242,7 @@ def adminEdit(request,slug,year):
                     if total_grants<grant_channels:
                         warnings.append("Warning: Total grants do not equal grants by channel of delivery for %s. Grants by channel of delivery are greater by %s" % (recipient_name,(grant_channels-total_grants)))
             #Loans table (both concessional and non-concessional)
-            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True).exclude(pledge_or_disbursement="P")
+            lt = entries.filter(spreadsheet=spreadsheet,loan_or_grant="L",sector__isnull=True,channel_of_delivery="").exclude(pledge_or_disbursement="P")
             lt_sum = lt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
             lt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in lt_sum} 
             #Sector loans
