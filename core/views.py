@@ -134,7 +134,7 @@ def edit(request,year):
                     loan_channels = cl_sum_obj[recipient]
                     if total_loans>loan_channels:
                         warnings.append("Warning: Total loans (concessional and non-concessional) do not equal loans by channel for %s. Total loans are greater by %s" % (recipient_name,(total_loans-loan_channels)))
-                    if total_loans<loan_sectors:
+                    if total_loans<loan_channels:
                         warnings.append("Warning: Total loans (concessional and non-concessional) do not equal loans by channel for %s. Loans by channel are greater by %s" % (recipient_name,(loan_channels-total_loans)))
                 
         else:
@@ -268,7 +268,7 @@ def adminEdit(request,slug,year):
                     loan_channels = cl_sum_obj[recipient]
                     if total_loans>loan_channels:
                         warnings.append("Warning: Total loans (concessional and non-concessional) do not equal loans by channel for %s. Total loans are greater by %s" % (recipient_name,(total_loans-loan_channels)))
-                    if total_loans<loan_sectors:
+                    if total_loans<loan_channels:
                         warnings.append("Warning: Total loans (concessional and non-concessional) do not equal loans by channel for %s. Loans by channel are greater by %s" % (recipient_name,(loan_channels-total_loans)))
                 
         else:
