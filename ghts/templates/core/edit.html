@@ -336,6 +336,31 @@
     {% endfor %}
     </table>
     {% endif %}
+    {% if organisation.loan_making %}    
+    <div class="titleWrap">
+        <h2>Loan contributions by channel of delivery</h2>
+       <!-- <div class="info" onclick="toggle('channel')"></div>
+        <div class="popupWrap">
+            <div class="popup" id="channel">Information on channel contributions - grants</div>
+        </div>-->
+    </div>
+    <table>
+        <tr>
+            <th></th>
+            {% for rcode, recip in recipients %}
+                <th>{{recip}}</th>
+            {% endfor %}
+        </tr>
+    {% for ccode, channel in channels %}
+        <tr>
+            <td><b>{{channel}}</b></td>
+            {% for rcode, recip in recipients %}
+                <td><input type="text" name="L|||{{rcode}}||{{ccode}}|"/></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
         {% for warning in warnings %}
             <p class="warning">{{warning}}</p>
         {% endfor %}
