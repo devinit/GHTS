@@ -117,9 +117,9 @@ class Entry(models.Model):
         ('U','UN agencies'),
         ('N','NGOs'),
         ('R','RCRC'),
-        ('G','Government institutions'),
+        ('G','Partner country government'),
         ('P','Private sector'),
-        ('O','Other channel of delivery'),
+        ('O','Other channel of delivery (please detail in the comments box)'),
     )
     FACILITY_CHOICES = (
         ('L','Contributions relating to London Conference pledges'),
