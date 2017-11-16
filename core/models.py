@@ -60,6 +60,12 @@ class Contact(models.Model):
 class Year(models.Model):
     value = models.IntegerField(unique=True)
     
+    def __str__(self):
+        return str(self.value)
+    
+    def __unicode__(self):
+        return u'%s' % self.value
+    
 class Spreadsheet(models.Model):
     year = models.ForeignKey(Year)
     agency = models.CharField(max_length=255,null=True,blank=True)
