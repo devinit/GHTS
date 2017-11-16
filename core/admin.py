@@ -1,9 +1,13 @@
 from django.contrib import admin
-from core.models import Contact, Organisation, Currency, Sector, Spreadsheet, Entry
+from core.models import Contact, Organisation, Currency, Sector, Spreadsheet, Entry, Year
 # Register your models here.
 
 class ContactInline(admin.TabularInline):
     model = Contact
+
+class YearAdmin(admin.ModelAdmin):
+    list_display = ['value']
+    save_on_top = True
 
 class OrganisationAdmin(admin.ModelAdmin):
     #fields display on change list
@@ -88,3 +92,4 @@ admin.site.register(Contact,ContactAdmin)
 admin.site.register(Sector,SectorAdmin)
 admin.site.register(Spreadsheet,SpreadsheetAdmin)
 admin.site.register(Entry,EntryAdmin)
+admin.site.register(Year,YearAdmin)
