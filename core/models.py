@@ -68,7 +68,7 @@ class Spreadsheet(models.Model):
     comment = models.TextField(null=True,blank=True)
     
     def get_absolute_url(self):
-        return reverse("core.views.edit",args=[self.year])
+        return reverse("core.views.edit",args=[self.year__value])
     
 class Entry(models.Model):
     coordinates = models.CharField(max_length=300,editable=False)
