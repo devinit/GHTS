@@ -90,7 +90,7 @@ def edit(request,year):
             entries = []
             currency = []
             spreadsheet_exists = False
-    return render(request,'core/edit-locked.html', {"warnings":warnings,"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"years":filtered_years,"selected_year":year,"currency":currency,"spreadsheet_exists":spreadsheet_exists})
+    return render(request,'core/edit-locked.html', {"warnings":warnings,"user":user,"contact":contact,"form":form,"entries":entries,"recipients":recipients,"statuses":statuses,"sectors":sectors,"years":years,"selected_year":year,"currency":currency,"spreadsheet_exists":spreadsheet_exists})
 
 @login_required
 def adminEdit(request,slug,year):
