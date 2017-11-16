@@ -11,7 +11,7 @@ class YearAdmin(admin.ModelAdmin):
 
 class OrganisationAdmin(admin.ModelAdmin):
     #fields display on change list
-    list_display = ['name','grant_making','loan_making','government']
+    list_display = ['name']
     inlines = [ContactInline,]
     prepopulated_fields = {'slug': ('name',), }
     filter_horizontal = ('sectors',)
@@ -58,24 +58,16 @@ class EntryAdmin(admin.ModelAdmin):
     list_display = ["number"
                     ,"organisation"
                     ,"year"
-                    ,"loan_or_grant"
-                    ,"concessional"
                     ,"pledge_or_disbursement"
                     ,"recipient"
                     ,"sector"
-                    ,"channel_of_delivery"
-                    ,"refugee_facility_for_turkey"
                     ,"amount"
                     ]
     list_filter = ["spreadsheet__organisation"
-                   ,"spreadsheet__year"
-                    ,"loan_or_grant"
-                    ,"concessional"
+                   ,"spreadsheet__year__value"
                     ,"pledge_or_disbursement"
                     ,"recipient"
                     ,"sector"
-                    ,"channel_of_delivery"
-                    ,"refugee_facility_for_turkey"
                     ]
     def number(self,obj):
         return obj.pk
