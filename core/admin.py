@@ -57,7 +57,7 @@ class EntryAdmin(admin.ModelAdmin):
     #fields display on change list
     list_display = ["number"
                     ,"organisation"
-                    ,"year"
+                    ,"year__value"
                     ,"pledge_or_disbursement"
                     ,"recipient"
                     ,"sector"
