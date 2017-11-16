@@ -23,7 +23,9 @@ def edit(request,year):
         sectors = Sector.objects.filter(default=True)
     else:
         organisationSectors = organisation.sectors.all()
-        sectors = organisationSectors.distinct()
+        defaultSectors = Sector.objects.filter(default=True)
+        unionSectors = organisationSectors | defaultSectors
+        sectors = unionSectors.distinct()
     years = Year.objects.all().order_by('value')
     year = int(year)
     if request.method == "POST":
@@ -106,7 +108,9 @@ def adminEdit(request,slug,year):
         sectors = Sector.objects.filter(default=True)
     else:
         organisationSectors = organisation.sectors.all()
-        sectors = organisationSectors.distinct()
+        defaultSectors = Sector.objects.filter(default=True)
+        unionSectors = organisationSectors | defaultSectors
+        sectors = unionSectors.distinct()
     years = Year.objects.all().order_by('value')
     year = int(year)
     if request.method == "POST":
