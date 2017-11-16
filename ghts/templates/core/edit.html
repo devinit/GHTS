@@ -129,10 +129,10 @@
         <select id="year">
             
             {% for year in years%}
-                {% if year == selected_year %}
-                <option value="{{year}}" selected="selected">{{year}}</option>
+                {% if year.value == selected_year %}
+                <option value="{{year.value}}" selected="selected">{{year.value}}</option>
                 {% else %}
-                <option value="{{year}}">{{year}}</option>
+                <option value="{{year.value}}">{{year}}</option>
                 {% endif %}
             {% endfor %}
         </select>
