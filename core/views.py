@@ -24,7 +24,7 @@ def edit(request,year):
     else:
         organisationSectors = organisation.sectors.all()
         sectors = organisationSectors.distinct()
-    years = Year.objects.all()
+    years = Year.objects.all().order_by('value')
     year = int(year)
     if request.method == "POST":
         form = SpreadsheetForm(request.POST)
@@ -107,7 +107,7 @@ def adminEdit(request,slug,year):
     else:
         organisationSectors = organisation.sectors.all()
         sectors = organisationSectors.distinct()
-    years = Year.objects.all()
+    years = Year.objects.all().order_by('value')
     year = int(year)
     if request.method == "POST":
         form = SpreadsheetForm(request.POST)
