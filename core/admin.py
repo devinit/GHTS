@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Contact, Organisation, Currency, Sector, Spreadsheet, Entry, Year
+from core.models import Contact, Organisation, Currency, Sector, Spreadsheet, Entry, Year, Recipient
 # Register your models here.
 
 class ContactInline(admin.TabularInline):
@@ -7,6 +7,10 @@ class ContactInline(admin.TabularInline):
 
 class YearAdmin(admin.ModelAdmin):
     list_display = ['value']
+    save_on_top = True
+    
+class RecipientAdmin(admin.ModelAdmin):
+    list_display = ['single_letter_code','name']
     save_on_top = True
 
 class OrganisationAdmin(admin.ModelAdmin):
@@ -85,3 +89,4 @@ admin.site.register(Sector,SectorAdmin)
 admin.site.register(Spreadsheet,SpreadsheetAdmin)
 admin.site.register(Entry,EntryAdmin)
 admin.site.register(Year,YearAdmin)
+admin.site.register(Recipient,RecipientAdmin)

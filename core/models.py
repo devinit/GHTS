@@ -4,6 +4,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+class Recipient(models.Model):
+    single_letter_code = models.CharField(max_length=1,unique=True)
+    name = models.CharField(max_length=255)
+
 class Currency(models.Model):
     symbol = models.CharField(max_length=10)
     iso = models.CharField(max_length=3)
@@ -88,14 +92,8 @@ class Entry(models.Model):
         ,('N','Conditional')
         ,('U','Unconditional')
     )
-    RECIPIENT_CHOICES = (
-        ('G','Germany'),
-        ('S','Sweden'),
-        ('N','Norway'),
-        ('U','United Kingdom')
-    )
     pledge_or_disbursement = models.CharField(max_length=1,choices=PLEDGE_OR_DISB_CHOICES,blank=True,null=True)
-    recipient = models.CharField(max_length=1,choices=RECIPIENT_CHOICES,default="N")
+    recipient = models.ForeignKey(Recipient)
     sector = models.ForeignKey(Sector,blank=True,null=True)
     def pledge_or_disbursement_lookup(self):
         val = self.coordinates.split("|")[0]
@@ -117,7 +115,7 @@ class Entry(models.Model):
         if val is None or val=="":
             return ""
         else:
-            return dict(Entry.RECIPIENT_CHOICES)[val]
+            return Recipient.objects.get(single_letter_code=val).name
     def sector_translate(self):
         val = self.coordinates.split("|")[2]
         return val
@@ -137,7 +135,7 @@ class Entry(models.Model):
         
     def save_reverse(self, *args, **kwargs):
         self.pledge_or_disbursement =  self.pledge_or_disbursement_lookup()
-        self.recipient = self.recipient_lookup()
+        self.recipient = Recipient.objects.get(single_letter_code=self.recipient_lookup())
         if Sector.objects.filter(name=self.sector_lookup()).exists():
             self.sector = Sector.objects.get(name=self.sector_lookup())
         super(Entry, self).save(*args, **kwargs)

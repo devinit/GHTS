@@ -154,15 +154,15 @@
     <table>
         <tr>
             <th></th>
-            {% for rcode, recip in recipients %}
-                <th>{{recip}}</th>
+            {% for recipient in recipients %}
+                <th>{{recipient.name}}</th>
             {% endfor %}
         </tr>
     {% for scode, status in statuses %}
         <tr>
             <td><b>{{status}}</b></td>
-            {% for rcode, recip in recipients %}
-                <td><input type="text" name="{{scode}}|{{rcode}}|"/></td>
+            {% for recipient in recipients %}
+                <td><input type="text" name="{{scode}}|{{recipient.single_letter_code}}|"/></td>
             {% endfor %}
         </tr>
     {% endfor %}
@@ -173,15 +173,15 @@
     <table>
         <tr>
             <th></th>
-            {% for rcode, recip in recipients %}
-                <th>{{recip}}</th>
+            {% for recipient in recipients %}
+                <th>{{recipient.name}}</th>
             {% endfor %}
         </tr>
     {% for sector in sectors %}
         <tr>
             <td><b>{{sector}}</b></td>
-            {% for rcode, recip in recipients %}
-                <td><input type="text" name="|{{rcode}}|{{sector}}"/></td>
+            {% for recipient in recipients %}
+                <td><input type="text" name="|{{recipient.single_letter_code}}|{{sector}}"/></td>
             {% endfor %}
         </tr>
     {% endfor %}

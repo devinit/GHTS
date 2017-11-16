@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, render_to_response
-from core.models import Organisation, Contact, Sector, Currency, Spreadsheet, Entry, Year
+from core.models import Organisation, Contact, Sector, Currency, Spreadsheet, Entry, Year, Recipient
 from unicodecsv import writer as csvwriter
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
@@ -17,7 +17,7 @@ def edit(request,year):
     user = request.user
     contact = get_object_or_404(Contact,user=user)
     organisation = contact.organisation
-    recipients = Entry.RECIPIENT_CHOICES
+    recipients = Recipient.objects.all()
     statuses = Entry.PLEDGE_OR_DISB_CHOICES
     if not organisation.sectors.all():
         sectors = Sector.objects.filter(default=True)
@@ -69,23 +69,24 @@ def edit(request,year):
             #Validate sums here
             #Grants table
             gt = entries.filter(spreadsheet=spreadsheet,sector__isnull=True)
-            gt_sum = gt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
-            gt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in gt_sum} 
+            gt_sum = gt.values('recipient__single_letter_code').annotate(total = Sum('amount')).order_by('recipient__single_letter_code')
+            gt_sum_obj = {this_sum['recipient__single_letter_code']:this_sum['total'] for this_sum in gt_sum} 
             #Sector grants
             sg = entries.filter(spreadsheet=spreadsheet,sector__isnull=False)
-            sg_sum = sg.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
-            sg_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in sg_sum} 
+            sg_sum = sg.values('recipient__single_letter_code').annotate(total = Sum('amount')).order_by('recipient__single_letter_code')
+            sg_sum_obj = {this_sum['recipient__single_letter_code']:this_sum['total'] for this_sum in sg_sum} 
             #Compare grants
-            for recipient,recipient_name in recipients:
+            for recipient in recipients:
+                code = recipient.single_letter_code
                 total_grants = 0
-                if recipient in gt_sum_obj:
-                    total_grants = total_grants + gt_sum_obj[recipient]
-                if recipient in sg_sum_obj:
-                    grant_sectors = sg_sum_obj[recipient]
+                if code in gt_sum_obj:
+                    total_grants = total_grants + gt_sum_obj[code]
+                if code in sg_sum_obj:
+                    grant_sectors = sg_sum_obj[code]
                     if total_grants>grant_sectors:
-                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Total grants are greater by %s" % (recipient_name,(total_grants-grant_sectors)))
+                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Total grants are greater by %s" % (recipient.name,(total_grants-grant_sectors)))
                     if total_grants<grant_sectors:
-                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Grants by sector are greater by %s" % (recipient_name,(grant_sectors-total_grants)))
+                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Grants by sector are greater by %s" % (recipient.name,(grant_sectors-total_grants)))
                         
         else:
             form = SpreadsheetForm()
@@ -102,7 +103,7 @@ def adminEdit(request,slug,year):
         return redirect("core.views.edit",year=year)
     contact = get_object_or_404(Contact,user=user)
     organisation = Organisation.objects.get(slug=slug)
-    recipients = Entry.RECIPIENT_CHOICES
+    recipients = Recipient.objects.all()
     statuses = Entry.PLEDGE_OR_DISB_CHOICES
     if not organisation.sectors.all():
         sectors = Sector.objects.filter(default=True)
@@ -153,23 +154,24 @@ def adminEdit(request,slug,year):
             #Validate sums here
             #Grants table
             gt = entries.filter(spreadsheet=spreadsheet,sector__isnull=True)
-            gt_sum = gt.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
-            gt_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in gt_sum} 
+            gt_sum = gt.values('recipient__single_letter_code').annotate(total = Sum('amount')).order_by('recipient__single_letter_code')
+            gt_sum_obj = {this_sum['recipient__single_letter_code']:this_sum['total'] for this_sum in gt_sum} 
             #Sector grants
             sg = entries.filter(spreadsheet=spreadsheet,sector__isnull=False)
-            sg_sum = sg.values('recipient').annotate(total = Sum('amount')).order_by('recipient')
-            sg_sum_obj = {this_sum['recipient']:this_sum['total'] for this_sum in sg_sum} 
+            sg_sum = sg.values('recipient__single_letter_code').annotate(total = Sum('amount')).order_by('recipient__single_letter_code')
+            sg_sum_obj = {this_sum['recipient__single_letter_code']:this_sum['total'] for this_sum in sg_sum} 
             #Compare grants
-            for recipient,recipient_name in recipients:
+            for recipient in recipients:
+                code = recipient.single_letter_code
                 total_grants = 0
-                if recipient in gt_sum_obj:
-                    total_grants = total_grants + gt_sum_obj[recipient]
-                if recipient in sg_sum_obj:
-                    grant_sectors = sg_sum_obj[recipient]
+                if code in gt_sum_obj:
+                    total_grants = total_grants + gt_sum_obj[code]
+                if code in sg_sum_obj:
+                    grant_sectors = sg_sum_obj[code]
                     if total_grants>grant_sectors:
-                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Total grants are greater by %s" % (recipient_name,(total_grants-grant_sectors)))
+                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Total grants are greater by %s" % (recipient.name,(total_grants-grant_sectors)))
                     if total_grants<grant_sectors:
-                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Grants by sector are greater by %s" % (recipient_name,(grant_sectors-total_grants)))
+                        warnings.append("Warning: Total grants do not equal grants by sector for %s. Grants by sector are greater by %s" % (recipient.name,(grant_sectors-total_grants)))
     
         else:
             form = SpreadsheetForm()
