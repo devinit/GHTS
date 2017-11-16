@@ -196,9 +196,9 @@
         </tr>
     {% endfor %}
     </table>
-    <div class="fieldWrapper">
+    <div class="fieldWrapper" style="padding-top:10px">
         {{ form.multisector_comment.errors }}
-        <label for="{{ form.multisector_comment.id_for_label }}">Details on multi-sector information:</label>
+        <label for="{{ form.multisector_comment.id_for_label }}">Multisector details:</label>
         {{ form.multisector_comment }}
     </div>
     <div class="titleWrap">
@@ -211,7 +211,7 @@
         </div>
         <div class="fieldWrapper">
             {{ form.comment.errors }}
-            <label for="{{ form.comment.id_for_label }}">Comment:</label>
+            <label for="{{ form.comment.id_for_label }}">Comments:</label>
             {{ form.comment }}
         </div>
         {% for warning in warnings %}
