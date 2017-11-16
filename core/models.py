@@ -99,35 +99,35 @@ class Entry(models.Model):
     recipient = models.CharField(max_length=1,choices=RECIPIENT_CHOICES,default="N")
     sector = models.ForeignKey(Sector,blank=True,null=True)
     def pledge_or_disbursement_lookup(self):
-        val = self.coordinates.split("|")[2]
+        val = self.coordinates.split("|")[0]
         return val
     def recipient_lookup(self):
-        val = self.coordinates.split("|")[3]
+        val = self.coordinates.split("|")[1]
         return val
     def sector_lookup(self):
-        val = self.coordinates.split("|")[4]
+        val = self.coordinates.split("|")[2]
         return val
     def pledge_or_disbursement_translate(self):
-        val = self.coordinates.split("|")[2]
+        val = self.coordinates.split("|")[0]
         if val is None or val=="":
             return ""
         else:
             return dict(Entry.PLEDGE_OR_DISB_CHOICES)[val]
     def recipient_translate(self):
-        val = self.coordinates.split("|")[3]
+        val = self.coordinates.split("|")[1]
         if val is None or val=="":
             return ""
         else:
             return dict(Entry.RECIPIENT_CHOICES)[val]
     def sector_translate(self):
-        val = self.coordinates.split("|")[4]
+        val = self.coordinates.split("|")[2]
         return val
 
     class Meta:
         verbose_name_plural = "entries"
         
     def save(self, *args, **kwargs):
-        #Coordinates are grant|concess|pledge|recip|sector|channel|facility
+        #Coordinates are pledge|recip|sector
         coord_list = [
             self.pledge_or_disbursement if self.pledge_or_disbursement else ""
             ,self.recipient if self.recipient else ""
