@@ -148,7 +148,16 @@
         });
     </script>
     <form method="POST" class="transaction-form">{% csrf_token %}
-        {{ form.as_p }}
+        <div class="fieldWrapper">
+            {{ form.currency.errors }}
+            <label for="{{ form.currency.id_for_label }}">Currency:</label>
+            {{ form.currency }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.agency.errors }}
+            <label for="{{ form.agency.id_for_label }}">Name of agency:</label>
+            {{ form.agency }}
+        </div>
     <div class="titleWrap">
         <h2>Grants</h2>
     </div>
@@ -187,6 +196,24 @@
         </tr>
     {% endfor %}
     </table>
+    <div class="fieldWrapper">
+        {{ form.multisector_comment.errors }}
+        <label for="{{ form.multisector_comment.id_for_label }}">Details on multi-sector information:</label>
+        {{ form.multisector_comment }}
+    </div>
+    <div class="titleWrap">
+        <h2>2017 data availability</h2>
+    </div>
+        <div class="fieldWrapper">
+            {{ form.availability_date.errors }}
+            <label for="{{ form.availability_date.id_for_label }}">Date 2017 data on cash-based programming is scheduled to be available:</label>
+            {{ form.availability_date }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.comment.errors }}
+            <label for="{{ form.comment.id_for_label }}">Comment:</label>
+            {{ form.comment }}
+        </div>
         {% for warning in warnings %}
             <p class="warning">{{warning}}</p>
         {% endfor %}

@@ -4,4 +4,4 @@ from core.models import Spreadsheet
 class SpreadsheetForm(ModelForm):
     class Meta:
         model = Spreadsheet
-        fields = ('currency','agency','comment',)
+        fields = ('currency','agency','comment','multisector_comment','availability_date')

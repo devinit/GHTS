@@ -76,6 +76,8 @@ class Spreadsheet(models.Model):
     currency = models.ForeignKey(Currency)
     organisation = models.ForeignKey(Organisation)
     comment = models.TextField(null=True,blank=True)
+    multisector_comment = models.TextField(null=True,blank=True)
+    availability_date = models.DateField(null=True,blank=True)
     
     def get_absolute_url(self):
         return reverse("core.views.edit",args=[self.year.value])
