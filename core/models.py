@@ -17,15 +17,8 @@ class Currency(models.Model):
         return self.iso
     
 class Sector(models.Model):
-    name = models.CharField(max_length=255)
-    LOAN_OR_GRANT_CHOICES = (
-        ('L','Loan'),
-        ('G','Grant'),
-    )
-    loan_or_grant = models.CharField(max_length=1,choices=LOAN_OR_GRANT_CHOICES,default='G')
+    name = models.CharField(max_length=255,unique=True)
     default = models.BooleanField(default=False)
-    def loan_verbose(self):
-        return dict(Transaction.LOAN_OR_GRANT_CHOICES)[self.loan_or_grant]
     
     def __unicode__(self):
         return u'%s' % self.name
@@ -139,8 +132,8 @@ class Entry(models.Model):
     def save_reverse(self, *args, **kwargs):
         self.pledge_or_disbursement =  self.pledge_or_disbursement_lookup()
         self.recipient = self.recipient_lookup()
-        if Sector.objects.filter(name=self.sector_lookup(),loan_or_grant=self.loan_or_grant_lookup()).exists():
-            self.sector = Sector.objects.get(name=self.sector_lookup(),loan_or_grant=self.loan_or_grant_lookup())
+        if Sector.objects.filter(name=self.sector_lookup()).exists():
+            self.sector = Sector.objects.get(name=self.sector_lookup())
         super(Entry, self).save(*args, **kwargs)
 
 

@@ -34,7 +34,7 @@ class ContactAdmin(admin.ModelAdmin):
     
 class SectorAdmin(admin.ModelAdmin):
     #fields display on change list
-    list_display = ['name','loan_or_grant','default']
+    list_display = ['name','default']
     #enable the save buttons on top of change form
     save_on_top = True
     # normaluser_fields = ('name','loan_or_grant',)
