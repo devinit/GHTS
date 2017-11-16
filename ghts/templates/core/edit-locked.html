@@ -178,14 +178,12 @@
             {% endfor %}
         </tr>
     {% for sector in sectors %}
-        {% if sector.loan_or_grant == "G" %}
         <tr>
             <td><b>{{sector}}</b></td>
             {% for rcode, recip in recipients %}
                 <td><input type="text" name="|{{rcode}}|{{sector}}"/></td>
             {% endfor %}
         </tr>
-        {% endif %}
     {% endfor %}
     </table>
         {% for warning in warnings %}
