@@ -193,13 +193,15 @@ def csv(request,slug):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="'+slug+'.csv"'
     writer = csvwriter(response,encoding='utf-8')
-    header = ["Organisation","Agency","Status","Recipient","Sector","Year","Amount","Currency","Comment"]
+    header = ["Organisation","Agency","Status","Recipient","Sector","Year","Amount","Currency","Multisector Comment","Comment","Future data availability date"]
     writer.writerow(header)
     for entry in entries:
         year = entry.spreadsheet.year.value
         comment = entry.spreadsheet.comment
         currency = entry.spreadsheet.currency
         agency = entry.spreadsheet.agency
+        multisector_comment = entry.spreadsheet.multisector_comment
+        availability_date = entry.spreadsheet.availability_date
         writer.writerow([organisation
                          ,agency
                          ,entry.pledge_or_disbursement_translate()
@@ -208,7 +210,9 @@ def csv(request,slug):
                          ,year
                          ,entry.amount
                          ,currency
+                         ,multisector_comment
                          ,comment
+                         ,availability_date
                          ])
     return response
 
@@ -220,7 +224,7 @@ def csv_all(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="all.csv"'
         writer = csvwriter(response,encoding='utf-8')
-        header = ["Organisation","Agency","Status","Recipient","Sector","Year","Amount","Currency","Comment"]
+        header = ["Organisation","Agency","Status","Recipient","Sector","Year","Amount","Currency","Multisector Comment","Comment","Future data availability date"]
         writer.writerow(header)
         for entry in entries:
             organisation = entry.spreadsheet.organisation
@@ -228,6 +232,8 @@ def csv_all(request):
             agency = entry.spreadsheet.agency
             comment = entry.spreadsheet.comment
             currency = entry.spreadsheet.currency
+            multisector_comment = entry.spreadsheet.multisector_comment
+            availability_date = entry.spreadsheet.availability_date
             writer.writerow([organisation
                          ,agency
                          ,entry.pledge_or_disbursement_translate()
@@ -236,7 +242,9 @@ def csv_all(request):
                          ,year
                          ,entry.amount
                          ,currency
+                         ,multisector_comment
                          ,comment
+                         ,availability_date
                          ])
         return response
     else:
