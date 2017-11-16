@@ -22,7 +22,7 @@
     {% endblock %}    
     {% block content %}
         <div id="content" style="width:100%">
-    <h1>Transactions for {{contact.organisation}} in {{year}}</h1>
+    <h1>Transactions for {{contact.organisation}} in {{selected_year}}</h1>
     <h3>Instructions to fill in the form <span onclick="$('#instructions').slideToggle()" id="instructTitle">(show/hide)</span></h3>
     <div id="instructions"
     {% if spreadsheet_exists %}
