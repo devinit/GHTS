@@ -71,7 +71,7 @@ class Spreadsheet(models.Model):
         (2016,2016),
     )
     year = models.IntegerField(choices=YEAR_CHOICES)
-    agency = models.CharField(max_length=255)
+    agency = models.CharField(max_length=255,null=True,blank=True)
     currency = models.ForeignKey(Currency)
     organisation = models.ForeignKey(Organisation)
     comment = models.TextField(null=True,blank=True)
