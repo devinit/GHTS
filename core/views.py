@@ -41,7 +41,7 @@ def edit(request,year):
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year__value=year)
             form = SpreadsheetForm(request.POST,instance=spreadsheet)
             spreadsheet = form.save()
-        excludeKeys = ["currency","comment","othersector_comment","availability_date","multisector_comment","csrfmiddlewaretoken"]
+        excludeKeys = ["currency","comment","othersector_comment","availability_date_month","availability_date_year","multisector_comment","csrfmiddlewaretoken"]
         for key, value in queryDict.iteritems():
             if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
                 entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
@@ -127,7 +127,7 @@ def adminEdit(request,slug,year):
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year__value=year)
             form = SpreadsheetForm(request.POST,instance=spreadsheet)
             spreadsheet = form.save()
-        excludeKeys = ["currency","comment","othersector_comment","availability_date","multisector_comment","csrfmiddlewaretoken"]
+        excludeKeys = ["currency","comment","othersector_comment","availability_date_month","availability_date_year","multisector_comment","csrfmiddlewaretoken"]
         for key, value in queryDict.iteritems():
             if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
                 entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
