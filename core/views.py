@@ -203,7 +203,6 @@ def csv(request,slug):
         othersector_comment = entry.spreadsheet.othersector_comment
         availability_date = entry.spreadsheet.availability_date
         writer.writerow([organisation
-                         ,agency
                          ,entry.pledge_or_disbursement_translate()
                          ,entry.recipient_translate()
                          ,entry.sector
@@ -230,14 +229,12 @@ def csv_all(request):
         for entry in entries:
             organisation = entry.spreadsheet.organisation
             year = entry.spreadsheet.year.value
-            agency = entry.spreadsheet.agency
             comment = entry.spreadsheet.comment
             currency = entry.spreadsheet.currency
             multisector_comment = entry.spreadsheet.multisector_comment
             othersector_comment = entry.spreadsheet.othersector_comment
             availability_date = entry.spreadsheet.availability_date
             writer.writerow([organisation
-                         ,agency
                          ,entry.pledge_or_disbursement_translate()
                          ,entry.recipient_translate()
                          ,entry.sector
