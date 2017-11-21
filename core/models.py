@@ -72,12 +72,12 @@ class Year(models.Model):
     
 class Spreadsheet(models.Model):
     year = models.ForeignKey(Year)
-    agency = models.CharField(max_length=255,null=True,blank=True)
     currency = models.ForeignKey(Currency)
     organisation = models.ForeignKey(Organisation)
     comment = models.TextField(null=True,blank=True)
     multisector_comment = models.TextField(null=True,blank=True)
-    availability_date = models.CharField(max_length=255,null=True,blank=True)
+    othersector_comment = models.TextField(null=True,blank=True)
+    availability_date = models.DateField(null=True,blank=True)
     
     def get_absolute_url(self):
         return reverse("core.views.edit",args=[self.year.value])

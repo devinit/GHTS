@@ -124,7 +124,7 @@
         In the context of this form, unearmarked refers to funding that is deliberately not directed to any particular sector by the donor. This differs from ‘sector not specified’ where details of sector-specific allocation are not available from the reports provided by the donors.  
     </p>
     </div>
-        <label>Change year:</label>
+        <label>Year:</label>
         <select id="year">
             
             {% for year in years%}
@@ -151,11 +151,6 @@
             {{ form.currency.errors }}
             <label for="{{ form.currency.id_for_label }}">Currency:</label>
             {{ form.currency }}
-        </div>
-        <div class="fieldWrapper">
-            {{ form.agency.errors }}
-            <label for="{{ form.agency.id_for_label }}">Name of agency:</label>
-            {{ form.agency }}
         </div>
     <div class="titleWrap">
         <h2>Grants</h2>
@@ -199,6 +194,11 @@
         {{ form.multisector_comment.errors }}
         <label for="{{ form.multisector_comment.id_for_label }}">Multisector details:</label>
         {{ form.multisector_comment }}
+    </div>
+    <div class="fieldWrapper" style="padding-top:10px">
+        {{ form.othersector_comment.errors }}
+        <label for="{{ form.othersector_comment.id_for_label }}">Other - please provide a brief description:</label>
+        {{ form.othersector_comment }}
     </div>
     <div class="titleWrap">
         <h2>2017 data availability</h2>

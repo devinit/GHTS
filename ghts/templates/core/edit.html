@@ -36,7 +36,6 @@
         Complete all fields on contributions (comprised of commitments, contracted funding and disbursements). If no commitment/contracted funding/disbursement was made please write '0'. If information is not yet available please leave blank.
     </p>
     <p>The form data is organised by calendar year (January to December), not fiscal year.</p>
-<!--    <p>Before submitting the form, check the data validation fields.</p>-->
     <p>
         Pledges and funding labelled as ‘multi-country’ refer to instances where funding is directed (or will be directed) to two or more (but not all) specified countries in the Syria region. This differs from pledges and funding labelled as going to the ‘region’, which is specified as funding for the regional response by donors and may go to all countries in the region; as well as ‘not defined’, which refers to pledges and funding where no country or regional detail has been provided.
     </p>
@@ -125,7 +124,7 @@
         In the context of this form, unearmarked refers to funding that is deliberately not directed to any particular sector by the donor. This differs from ‘sector not specified’ where details of sector-specific allocation are not available from the reports provided by the donors.  
     </p>
     </div>
-        <label>Change year:</label>
+        <label>Year:</label>
         <select id="year">
             
             {% for year in years%}
@@ -152,11 +151,6 @@
             {{ form.currency.errors }}
             <label for="{{ form.currency.id_for_label }}">Currency:</label>
             {{ form.currency }}
-        </div>
-        <div class="fieldWrapper">
-            {{ form.agency.errors }}
-            <label for="{{ form.agency.id_for_label }}">Name of agency:</label>
-            {{ form.agency }}
         </div>
     <div class="titleWrap">
         <h2>Grants</h2>
@@ -200,6 +194,11 @@
         {{ form.multisector_comment.errors }}
         <label for="{{ form.multisector_comment.id_for_label }}">Multisector details:</label>
         {{ form.multisector_comment }}
+    </div>
+    <div class="fieldWrapper" style="padding-top:10px">
+        {{ form.othersector_comment.errors }}
+        <label for="{{ form.othersector_comment.id_for_label }}">Other - please provide a brief description:</label>
+        {{ form.othersector_comment }}
     </div>
     <div class="titleWrap">
         <h2>2017 data availability</h2>

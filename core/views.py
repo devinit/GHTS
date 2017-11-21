@@ -41,7 +41,7 @@ def edit(request,year):
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year__value=year)
             form = SpreadsheetForm(request.POST,instance=spreadsheet)
             spreadsheet = form.save()
-        excludeKeys = ["currency","comment","agency","availability_date","multisector_comment","csrfmiddlewaretoken"]
+        excludeKeys = ["currency","comment","othersector_comment","availability_date","multisector_comment","csrfmiddlewaretoken"]
         for key, value in queryDict.iteritems():
             if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
                 entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
@@ -127,7 +127,7 @@ def adminEdit(request,slug,year):
             spreadsheet = Spreadsheet.objects.get(organisation=organisation,year__value=year)
             form = SpreadsheetForm(request.POST,instance=spreadsheet)
             spreadsheet = form.save()
-        excludeKeys = ["currency","comment","agency","availability_date","multisector_comment","csrfmiddlewaretoken"]
+        excludeKeys = ["currency","comment","othersector_comment","availability_date","multisector_comment","csrfmiddlewaretoken"]
         for key, value in queryDict.iteritems():
             if Entry.objects.filter(spreadsheet=spreadsheet,coordinates=key).exists():
                 entry = Entry.objects.get(spreadsheet=spreadsheet,coordinates=key)
@@ -193,14 +193,14 @@ def csv(request,slug):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="'+slug+'.csv"'
     writer = csvwriter(response,encoding='utf-8')
-    header = ["Organisation","Agency","Status","Recipient","Sector","Year","Amount","Currency","Multisector Comment","Comment","Future data availability date"]
+    header = ["Agency","Status","Recipient","Sector","Year","Amount","Currency","Multisector Comment","Other sector comment","Comment","Future data availability date"]
     writer.writerow(header)
     for entry in entries:
         year = entry.spreadsheet.year.value
         comment = entry.spreadsheet.comment
         currency = entry.spreadsheet.currency
-        agency = entry.spreadsheet.agency
         multisector_comment = entry.spreadsheet.multisector_comment
+        othersector_comment = entry.spreadsheet.othersector_comment
         availability_date = entry.spreadsheet.availability_date
         writer.writerow([organisation
                          ,agency
@@ -211,6 +211,7 @@ def csv(request,slug):
                          ,entry.amount
                          ,currency
                          ,multisector_comment
+                         ,othersector_comment
                          ,comment
                          ,availability_date
                          ])
@@ -224,7 +225,7 @@ def csv_all(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="all.csv"'
         writer = csvwriter(response,encoding='utf-8')
-        header = ["Organisation","Agency","Status","Recipient","Sector","Year","Amount","Currency","Multisector Comment","Comment","Future data availability date"]
+        header = ["Agency","Status","Recipient","Sector","Year","Amount","Currency","Multisector Comment","Other sector comment","Comment","Future data availability date"]
         writer.writerow(header)
         for entry in entries:
             organisation = entry.spreadsheet.organisation
@@ -233,6 +234,7 @@ def csv_all(request):
             comment = entry.spreadsheet.comment
             currency = entry.spreadsheet.currency
             multisector_comment = entry.spreadsheet.multisector_comment
+            othersector_comment = entry.spreadsheet.othersector_comment
             availability_date = entry.spreadsheet.availability_date
             writer.writerow([organisation
                          ,agency
@@ -243,6 +245,7 @@ def csv_all(request):
                          ,entry.amount
                          ,currency
                          ,multisector_comment
+                         ,othersector_comment
                          ,comment
                          ,availability_date
                          ])
